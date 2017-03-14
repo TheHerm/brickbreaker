@@ -1,0 +1,19 @@
+{
+  "name": "react-bones-ah",
+  "version": "1.0.0",
+  "description": "This is a fully tested bare-bones react starter app",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheHerm/react-bones-ah.git"
+  },
+  "author": "TheHerm",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheHerm/react-bones-ah/issues"
+  },
+  "homepage": "https://github.com/TheHerm/react-bones-ah#readme"
+}
