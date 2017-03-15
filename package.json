@@ -34,6 +34,7 @@
     "sequelize": "^3.24.1",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
+    "sinon-spy-react": "^2.0.1",
     "webpack": "^1.13.2"
   },
   "repository": {

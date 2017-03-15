@@ -4,7 +4,7 @@ import Store from '../redux/store.js';
 import { incrementCount } from '../redux/reducers/counter.js';
 
 
-class MainContainer extends React.Component{
+export class MainContainer extends React.Component{
   constructor(props){
     super(props);
     this.handleCountClick = this.handleCountClick.bind(this);
