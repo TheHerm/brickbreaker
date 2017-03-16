@@ -1,9 +1,7 @@
 import React from 'react';
-import chai, {expect} from 'chai';                                                 
+import chai, {expect} from 'chai';                                               
 chai.use(require('chai-enzyme')());
 import {shallow} from 'enzyme';
-import TestUtils from 'react-addons-test-utils';
-import { spyOnComponentMethod } from 'sinon-spy-react';
 import Store from '../redux/store.js';
 
 import { MainContainer } from './maincontainer.jsx'

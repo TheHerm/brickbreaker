@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch server -e js,html,jsx server/index.js",
-    "test": "mocha --compilers js:babel-register client/*.test.jsx server/**/*.test.js",
+    "test": "mocha --compilers js:babel-register client/*.test.jsx server/**/*.test.js redux/**/*.test.js",
     "build": "webpack -w"
   },
   "dependencies": {
