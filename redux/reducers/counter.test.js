@@ -1,5 +1,5 @@
 import { incrementCount, INCREMENT_COUNT, count } from './counter.js';
-import chai, {expect} from 'chai';                                               
+import chai, {expect} from 'chai';                                            
 
 
 describe('counter reducer', () => {
