@@ -1,3 +1,4 @@
-React-Bones-AH
+BrickBreaker
 
-This is a fully tested React-Redux starter application.
+
+Expirimenting with the HTML canvas to create a brickbreaker game with react.
