@@ -1,9 +1,8 @@
-.title-text{
-  font-size: 5em;
+.canvas-container{
   text-align: center;
 }
 
-.count{
-  font-size: 5em;
-  text-align: center;
+#myCanvas{
+  border: 1px solid black;
+  margin: 50px 0px;
 }
