@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { fillCanvas } from './canvaslogic.js';
 // import { connect } from 'react-redux';
 // import Store from '../redux/store.js';
 
@@ -9,13 +10,7 @@ class CanvasContainer extends React.Component{
   }
 
   componentDidMount(){
-    let canvas = document.getElementById('myCanvas');
-    let ctx = canvas.getContext('2d');
-    ctx.beginPath();
-    ctx.rect(20, 40, 50, 50);
-    ctx.fillStyle = "#FF0000";
-    ctx.fill();
-    ctx.closePath();
+    fillCanvas();
   }
 
   render(){
