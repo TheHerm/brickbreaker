@@ -3,10 +3,10 @@ export const fillCanvas = function(){
   let canvas = document.getElementById('myCanvas');
   let ctx = canvas.getContext('2d');
 
-  let xPos = canvas.width/2;
-  let yPos = canvas.height-30;
-  let xMov = -5;
-  let yMov = -5;
+  let xPos = canvas.width / 2;
+  let yPos = canvas.height - 30;
+  let xMov = -2;
+  let yMov = -2;
   let ballRadius = 10;
 
   let drawBall = function(){
@@ -19,13 +19,11 @@ export const fillCanvas = function(){
 
   let draw = function() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(yPos + yMov < 0) yMov = -yMov;
-    if(yPos + yMov > canvas.height) yMov = -yMov;
-    if(xPos + xMov < 0) xMov = -xMov;
-    if(xPos + xMov > canvas.width) xMov = -xMov;
     drawBall();
     xPos += xMov;
     yPos += yMov;
+    if((yPos-ballRadius+2) + yMov < 0 || (yPos+ballRadius-2) + yMov > canvas.height) yMov = -yMov;
+    if((xPos-ballRadius+2) + xMov < 0 || (xPos+ballRadius-2) + xMov > canvas.width) xMov = -xMov;
   }
 
   setInterval(draw, (1000 / 60));
