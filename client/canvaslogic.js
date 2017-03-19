@@ -115,14 +115,14 @@ export const FillCanvas = function(){
     this.ctx.beginPath();
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Score: "+this.score, 8, 20);
+    this.ctx.fillText("Score: " + this.score, 8, 20);
     this.ctx.closePath();
   }
 
   this.drawLives = function() {
     this.ctx.font = "16px Arial";
     this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Lives: "+this.lives, this.canvas.width-65, 20);
+    this.ctx.fillText("Lives: " + this.lives, this.canvas.width-65, 20);
   }
 
   this.draw = function() {
