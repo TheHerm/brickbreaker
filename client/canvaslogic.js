@@ -1,103 +1,108 @@
 
-export const fillCanvas = function(){
-  let canvas = document.getElementById('myCanvas');
-  let ctx = canvas.getContext('2d');
+export const FillCanvas = function(){
+  this.canvas = document.getElementById('myCanvas');
+  this.ctx = this.canvas.getContext('2d');
+  this.xPos = this.canvas.width / 2;
+  this.yPos = this.canvas.height - 30;
+  this.xMov = -5;
+  this.yMov = -5
+  this.ballRadius = 10;
+  this.paddleHeight = 10;
+  this.paddleWidth = 75;
+  this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+  this.rightPressed = false;
+  this.leftPressed = false;
+  this.brickRowCount = 3;
+  this.brickColumnCount = 7;
+  this.brickWidth = 75;
+  this.brickHeight = 20;
+  this.brickPadding = 10;
+  this.brickOffsetTop = 30;
+  this.brickOffsetLeft = 30;
+  this.bricks = [];
+  this.score = 0
+  this.lives = 3;
 
-  let xPos = canvas.width / 2;
-  let yPos = canvas.height - 30;
-  let xMov = -5;
-  let yMov = -5;
-  let ballRadius = 10;
-  let paddleHeight = 10;
-  let paddleWidth = 75;
-  let paddleX = (canvas.width-paddleWidth)/2;
-  let rightPressed = false;
-  let leftPressed = false;
-  let brickRowCount = 3;
-  let brickColumnCount = 5;
-  let brickWidth = 75;
-  let brickHeight = 20;
-  let brickPadding = 10;
-  let brickOffsetTop = 30;
-  let brickOffsetLeft = 30;
-  let bricks = [];
-  let score = 0;
-  let lives = 3;
-
-  for(let c=0; c<brickColumnCount; c++) {
-    bricks[c] = [];
-    for(let r=0; r<brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
+  this.startGame = function(){
+    for(let c=0; c<this.brickColumnCount; c++) {
+      this.bricks[c] = [];
+      for(let r=0; r<this.brickRowCount; r++) {
+        this.bricks[c][r] = { x: 0, y: 0, status: 1 };
+      }
     }
+    document.addEventListener("keydown", this.keyDownHandler, false);
+    document.addEventListener("keyup", this.keyUpHandler, false);
+    document.addEventListener("mousemove", this.mouseMoveHandler, false);
+    this.draw();
   }
 
-  function drawBricks() {
-    for(let c=0; c<brickColumnCount; c++) {
-      for(let r=0; r<brickRowCount; r++) {
-        if(!bricks[c][r].status) continue;
-        let brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
-        let brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
-        ctx.beginPath();
-        ctx.rect(bricks[c][r].x, bricks[c][r].y, brickWidth, brickHeight);
-        ctx.fillStyle = "#0095DD";
-        ctx.fill();
-        ctx.closePath();
+  this.drawBricks = function() {
+    for(let c=0; c<this.brickColumnCount; c++) {
+      for(let r=0; r<this.brickRowCount; r++) {
+        if(!this.bricks[c][r].status) continue;
+        let brickX = (c*(this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
+        let brickY = (r*(this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
+        this.bricks[c][r].x = brickX;
+        this.bricks[c][r].y = brickY;
+        this.ctx.beginPath();
+        this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
+        this.ctx.fillStyle = "#0095DD";
+        this.ctx.fill();
+        this.ctx.closePath();
       }
     }
   }
 
-  let drawBall = function(){
-    ctx.beginPath();
-    ctx.arc(xPos, yPos, ballRadius, 0, Math.PI*2);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
+  this.drawBall = function(){
+    this.ctx.beginPath();
+    this.ctx.arc(this.xPos, this.yPos, this.ballRadius, 0, Math.PI*2);
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fill();
+    this.ctx.closePath();
   }
 
-  function drawPaddle() {
-    ctx.beginPath();
-    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-    ctx.fillStyle = "#0095DD";
-    ctx.fill();
-    ctx.closePath();
+  this.drawPaddle = function() {
+    this.ctx.beginPath();
+    this.ctx.rect(this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth, this.paddleHeight);
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fill();
+    this.ctx.closePath();
   }
 
-  function keyDownHandler(e) {
+  this.keyDownHandler = function(e) {
     if(e.keyCode == 39) {
-        rightPressed = true;
+      this.rightPressed = true;
     }
     else if(e.keyCode == 37) {
-        leftPressed = true;
+      this.leftPressed = true;
     }
   }
 
-  function keyUpHandler(e) {
+  this.keyUpHandler = function(e) {
     if(e.keyCode == 39) {
-      rightPressed = false;
+      this.rightPressed = false;
     }
     else if(e.keyCode == 37) {
-      leftPressed = false;
+      this.leftPressed = false;
     }
   }
 
-  function mouseMoveHandler(e) {
-    let relativeX = e.clientX - canvas.offsetLeft;
-    if(relativeX > 0 && relativeX < canvas.width) {
-      paddleX = relativeX - paddleWidth/2;
+  this.mouseMoveHandler = function(e) {
+    let relativeX = e.clientX - this.canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < this.canvas.width) {
+      this.paddleX = relativeX - this.paddleWidth/2;
     }
   }
 
-  function collisionDetection() {
-    for(let c=0; c<brickColumnCount; c++) {
-      for(let r=0; r<brickRowCount; r++) {
-        var b = bricks[c][r];
-        if(b.status && xPos > b.x && xPos < b.x+brickWidth && yPos > b.y && yPos < b.y+brickHeight) {
-          yMov = -yMov;
+  this.collisionDetection = function() {
+    for(let c=0; c<this.brickColumnCount; c++) {
+      for(let r=0; r<this.brickRowCount; r++) {
+        var b = this.bricks[c][r];
+        if(b.status && this.xPos > b.x && this.xPos < b.x+this.brickWidth && this.yPos > b.y && this.yPos < b.y+this.brickHeight) {
+          this.yMov = -this.yMov;
           b.status = 0;
-          score++;
-          if(score == brickRowCount*brickColumnCount) {
+          this.score++;
+          if(this.score == this.brickRowCount*this.brickColumnCount) {
             alert("YOU WIN, CONGRATULATIONS!");
             document.location.reload();
           }
@@ -106,57 +111,56 @@ export const fillCanvas = function(){
     }
   }
 
-  function drawScore() {
-    ctx.beginPath();
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.fillText("Score: "+score, 8, 20);
-    ctx.closePath();
+  this.drawScore = function() {
+    this.ctx.beginPath();
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Score: "+this.score, 8, 20);
+    this.ctx.closePath();
   }
 
-  function drawLives() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
-    ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+  this.drawLives = function() {
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Lives: "+this.lives, this.canvas.width-65, 20);
   }
 
-  let draw = function() {
-    xPos += xMov;
-    yPos += yMov;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawScore();
-    drawLives();
-    drawBricks();
-    drawBall();
-    drawPaddle();
-    if((xPos-ballRadius+2) + xMov < 0 || (xPos+ballRadius-2) + xMov > canvas.width)   xMov = -xMov;
-    if((yPos-ballRadius+2) + yMov < 0)   yMov = -yMov;
-    if((yPos+ballRadius-2) > canvas.height) {
-      if(xPos > paddleX && xPos < paddleX + paddleWidth)   yMov = -yMov;
+  this.draw = function() {
+    this.xPos += this.xMov;
+    this.yPos += this.yMov;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawScore();
+    this.drawLives();
+    this.drawBricks();
+    this.drawBall();
+    this.drawPaddle();
+    if((this.xPos-this.ballRadius+2) + this.xMov < 0 || (this.xPos+this.ballRadius-2) + this.xMov > this.canvas.width)   this.xMov = -this.xMov;
+    if((this.yPos-this.ballRadius+2) + this.yMov < 0)   this.yMov = -this.yMov;
+    if((this.yPos+this.ballRadius-2) > this.canvas.height) {
+      if(this.xPos > this.paddleX && this.xPos < this.paddleX + this.paddleWidth)   this.yMov = -this.yMov;
       else {
-        lives--;
-        if(!lives) {
+        this.lives--;
+        if(!this.lives) {
           alert("GAME OVER");
           document.location.reload();
         }else {
-          xPos = canvas.width/2;
-          yPos = canvas.height-30;
-          xMov = 5;
-          yMov = -5;
-          paddleX = (canvas.width-paddleWidth)/2;
+          this.xPos = this.canvas.width/2;
+          this.yPos = this.canvas.height-30;
+          this.xMov = 5;
+          this.yMov = -5;
+          this.paddleX = (this.canvas.width-this.paddleWidth)/2;
         }
       }
     }
-    collisionDetection();
-    if(rightPressed && paddleX < canvas.width-paddleWidth)   paddleX += 7;
-    else if(leftPressed && paddleX > 0)   paddleX -= 7;
-    requestAnimationFrame(draw);
+    this.collisionDetection();
+    if(this.rightPressed && this.paddleX < this.canvas.width-this.paddleWidth)   this.paddleX += 7;
+    else if(this.leftPressed && this.paddleX > 0)   this.paddleX -= 7;
+    requestAnimationFrame(this.draw);
   }
 
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
-  document.addEventListener("mousemove", mouseMoveHandler, false);
-
-  draw();
-
+  this.draw = this.draw.bind(this);
+  this.keyDownHandler = this.keyDownHandler.bind(this);
+  this.keyUpHandler = this.keyUpHandler.bind(this);
+  this.mouseMoveHandler = this.mouseMoveHandler.bind(this);  
+  
 }

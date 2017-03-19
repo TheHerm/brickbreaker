@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { fillCanvas } from './canvaslogic.js';
+import { FillCanvas } from './canvaslogic.js';
 // import { connect } from 'react-redux';
 // import Store from '../redux/store.js';
 
@@ -10,7 +10,8 @@ class CanvasContainer extends React.Component{
   }
 
   componentDidMount(){
-    fillCanvas();
+    let game = new FillCanvas();
+    game.startGame();
   }
 
   render(){
