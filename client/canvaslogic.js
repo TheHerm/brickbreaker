@@ -5,7 +5,7 @@ export const FillCanvas = function(){
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 30;
   this.xMov = -5;
-  this.yMov = -5
+  this.yMov = -5;
   this.ballRadius = 10;
   this.paddleHeight = 10;
   this.paddleWidth = 75;
@@ -20,8 +20,9 @@ export const FillCanvas = function(){
   this.brickOffsetTop = 30;
   this.brickOffsetLeft = 30;
   this.bricks = [];
-  this.score = 0
+  this.score = 0;
   this.lives = 3;
+  this.endGame = false;
 
   this.startGame = function(){
     for(let c=0; c<this.brickColumnCount; c++) {
@@ -30,10 +31,10 @@ export const FillCanvas = function(){
         this.bricks[c][r] = { x: 0, y: 0, status: 1 };
       }
     }
-    document.addEventListener("keydown", this.keyDownHandler, false);
-    document.addEventListener("keyup", this.keyUpHandler, false);
+    // document.addEventListener("keydown", this.keyDownHandler, false);
+    // document.addEventListener("keyup", this.keyUpHandler, false);
     document.addEventListener("mousemove", this.mouseMoveHandler, false);
-    this.draw();
+    this.animate();
   }
 
   this.drawBricks = function() {
@@ -69,23 +70,6 @@ export const FillCanvas = function(){
     this.ctx.closePath();
   }
 
-  this.keyDownHandler = function(e) {
-    if(e.keyCode == 39) {
-      this.rightPressed = true;
-    }
-    else if(e.keyCode == 37) {
-      this.leftPressed = true;
-    }
-  }
-
-  this.keyUpHandler = function(e) {
-    if(e.keyCode == 39) {
-      this.rightPressed = false;
-    }
-    else if(e.keyCode == 37) {
-      this.leftPressed = false;
-    }
-  }
 
   this.mouseMoveHandler = function(e) {
     let relativeX = e.clientX - this.canvas.offsetLeft;
@@ -94,7 +78,29 @@ export const FillCanvas = function(){
     }
   }
 
-  this.collisionDetection = function() {
+  this.wallCollisionDetection = function(){
+    if((this.xPos-this.ballRadius+2) + this.xMov < 0 
+        || (this.xPos+this.ballRadius-2) + this.xMov > this.canvas.width){
+          this.xMov = -this.xMov;
+    }
+    if((this.yPos-this.ballRadius+2) + this.yMov < 0){
+      this.yMov = -this.yMov;
+    }
+  }
+
+  this.checkEnd = function(){
+    if(this.score == this.brickRowCount*this.brickColumnCount) {
+      this.endGame = true;
+      alert("YOU WIN, CONGRATULATIONS!");
+      document.location.reload();
+    }else if(!this.lives) {
+      this.endGame = true;
+      alert("GAME OVER");
+      document.location.reload();
+    }
+  }
+
+  this.brickCollisionDetection = function() {
     for(let c=0; c<this.brickColumnCount; c++) {
       for(let r=0; r<this.brickRowCount; r++) {
         var b = this.bricks[c][r];
@@ -102,10 +108,24 @@ export const FillCanvas = function(){
           this.yMov = -this.yMov;
           b.status = 0;
           this.score++;
-          if(this.score == this.brickRowCount*this.brickColumnCount) {
-            alert("YOU WIN, CONGRATULATIONS!");
-            document.location.reload();
-          }
+          this.checkEnd();
+        }
+      }
+    }
+  }
+
+  this.bottomAndPaddleCollisionDetection = function(){
+    if((this.yPos+this.ballRadius-2) > this.canvas.height) {
+      if(this.xPos > this.paddleX && this.xPos < this.paddleX + this.paddleWidth)   this.yMov = -this.yMov;
+      else {
+        this.lives--;
+        this.checkEnd();
+        if(this.lives){
+          this.xPos = this.canvas.width / 2;
+          this.yPos = this.canvas.height-30;
+          this.xMov = 5;
+          this.yMov = -5;
+          this.paddleX = (this.canvas.width-this.paddleWidth) / 2;
         }
       }
     }
@@ -125,42 +145,50 @@ export const FillCanvas = function(){
     this.ctx.fillText("Lives: " + this.lives, this.canvas.width-65, 20);
   }
 
+  this.animate = function(){
+    this.brickCollisionDetection();
+    this.wallCollisionDetection();
+    this.bottomAndPaddleCollisionDetection();
+    if(!this.endGame) {
+      this.draw();
+      requestAnimationFrame(this.animate);
+    }
+  }
+
   this.draw = function() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.xPos += this.xMov;
     this.yPos += this.yMov;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawScore();
     this.drawLives();
     this.drawBricks();
     this.drawBall();
     this.drawPaddle();
-    if((this.xPos-this.ballRadius+2) + this.xMov < 0 || (this.xPos+this.ballRadius-2) + this.xMov > this.canvas.width)   this.xMov = -this.xMov;
-    if((this.yPos-this.ballRadius+2) + this.yMov < 0)   this.yMov = -this.yMov;
-    if((this.yPos+this.ballRadius-2) > this.canvas.height) {
-      if(this.xPos > this.paddleX && this.xPos < this.paddleX + this.paddleWidth)   this.yMov = -this.yMov;
-      else {
-        this.lives--;
-        if(!this.lives) {
-          alert("GAME OVER");
-          document.location.reload();
-        }else {
-          this.xPos = this.canvas.width/2;
-          this.yPos = this.canvas.height-30;
-          this.xMov = 5;
-          this.yMov = -5;
-          this.paddleX = (this.canvas.width-this.paddleWidth)/2;
-        }
-      }
-    }
-    this.collisionDetection();
-    if(this.rightPressed && this.paddleX < this.canvas.width-this.paddleWidth)   this.paddleX += 7;
-    else if(this.leftPressed && this.paddleX > 0)   this.paddleX -= 7;
-    requestAnimationFrame(this.draw);
   }
 
   this.draw = this.draw.bind(this);
-  this.keyDownHandler = this.keyDownHandler.bind(this);
-  this.keyUpHandler = this.keyUpHandler.bind(this);
+  this.animate = this.animate.bind(this);
+  // this.keyDownHandler = this.keyDownHandler.bind(this);
+  // this.keyUpHandler = this.keyUpHandler.bind(this);
   this.mouseMoveHandler = this.mouseMoveHandler.bind(this);  
   
 }
+
+
+  // this.keyDownHandler = function(e) {
+  //   if(e.keyCode == 39) {
+  //     this.rightPressed = true;
+  //   }
+  //   else if(e.keyCode == 37) {
+  //     this.leftPressed = true;
+  //   }
+  // }
+
+  // this.keyUpHandler = function(e) {
+  //   if(e.keyCode == 39) {
+  //     this.rightPressed = false;
+  //   }
+  //   else if(e.keyCode == 37) {
+  //     this.leftPressed = false;
+  //   }
+  // }

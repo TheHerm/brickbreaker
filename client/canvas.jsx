@@ -19,7 +19,7 @@ class CanvasContainer extends React.Component{
   }
 
   handleStartGame(){
-    this.setState({start: 1});
+    this.setState({ start: 1 });
     this.state.game.startGame();
   }
 
