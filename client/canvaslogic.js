@@ -4,8 +4,8 @@ export const FillCanvas = function(){
   this.ctx = this.canvas.getContext('2d');
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 30;
-  this.xMov = -5;
-  this.yMov = -5;
+  this.xMov = 2;
+  this.yMov = -2;
   this.ballRadius = 10;
   this.paddleHeight = 10;
   this.paddleWidth = 75;
@@ -14,11 +14,11 @@ export const FillCanvas = function(){
   this.leftPressed = false;
   this.brickRowCount = 3;
   this.brickColumnCount = 7;
-  this.brickWidth = 75;
-  this.brickHeight = 20;
-  this.brickPadding = 10;
-  this.brickOffsetTop = 30;
-  this.brickOffsetLeft = 30;
+  this.brickWidth = 50;
+  this.brickHeight = 50;
+  this.brickPadding = 30;
+  this.brickOffsetTop = 100;
+  this.brickOffsetLeft = 70;
   this.bricks = [];
   this.score = 0;
   this.lives = 3;
@@ -37,9 +37,19 @@ export const FillCanvas = function(){
     this.animate();
   }
 
+  this.drawScore = function() {
+    this.ctx.beginPath();
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Score: " + this.score, 8, 20);
+    this.ctx.closePath();
+  }
+
   this.drawBricks = function() {
+    let count = 0;
     for(let c=0; c<this.brickColumnCount; c++) {
       for(let r=0; r<this.brickRowCount; r++) {
+        this.bricks[c][r].num = ++count;
         if(!this.bricks[c][r].status) continue;
         let brickX = (c*(this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
         let brickY = (r*(this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
@@ -47,8 +57,13 @@ export const FillCanvas = function(){
         this.bricks[c][r].y = brickY;
         this.ctx.beginPath();
         this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
+        this.ctx.strokeStyle = "#0095DD";
+        this.ctx.stroke();
+        this.ctx.closePath();
+        this.ctx.beginPath();
+        this.ctx.font = "16px Arial";
         this.ctx.fillStyle = "#0095DD";
-        this.ctx.fill();
+        this.ctx.fillText(this.bricks[c][r].num, brickX+20, brickY+20);
         this.ctx.closePath();
       }
     }
@@ -104,11 +119,31 @@ export const FillCanvas = function(){
     for(let c=0; c<this.brickColumnCount; c++) {
       for(let r=0; r<this.brickRowCount; r++) {
         var b = this.bricks[c][r];
-        if(b.status && this.xPos > b.x && this.xPos < b.x+this.brickWidth && this.yPos > b.y && this.yPos < b.y+this.brickHeight) {
-          this.yMov = -this.yMov;
-          b.status = 0;
-          this.score++;
-          this.checkEnd();
+        if(b.status && (this.xPos+this.ballRadius) > b.x 
+                    && (this.xPos-this.ballRadius) < (b.x+this.brickWidth)
+                    && ((this.yPos-this.ballRadius) > b.y || (this.yPos+this.ballRadius) > b.y)
+                    && (this.yPos+this.ballRadius) < (b.y+this.brickHeight+2*this.ballRadius)
+          ){
+            if( ( this.xPos+this.ballRadius >= b.x && this.xPos-this.ballRadius < (b.x-this.ballRadius) + 2 )
+               || ( this.xPos-this.ballRadius <= b.x+this.brickWidth && this.xPos+this.ballRadius > (b.x+this.brickWidth+2*this.ballRadius) - 2)
+               && (this.yPos-this.ballRadius <= (b.y+this.brickHeight) - 2*this.ballRadius
+                || (this.yPos+this.ballRadius >= b.y+this.ballRadius && this.yPos+this.ballRadius <= b.y+this.brickHeight+2*this.ballRadius) ) 
+            ){
+              console.log('------', b.num, '------\n')
+              console.log(this.xPos+this.ballRadius >= b.x, this.xPos-this.ballRadius < (b.x-this.ballRadius) + 2, "\n")
+              console.log("or.....")
+              console.log(this.xPos-this.ballRadius <= b.x+this.brickWidth, this.xPos+this.ballRadius > (b.x+this.brickWidth+this.ballRadius) - 2, "\n")
+              console.log("and.....")
+              console.log(this.yPos-this.ballRadius <= (b.y+this.brickHeight) - 2*this.ballRadius, "\n")
+              console.log("or......")
+              console.log(this.yPos+this.ballRadius >= b.y+this.ballRadius, this.yPos+this.ballRadius <= b.y+this.brickHeight+2*this.ballRadius)
+              this.xMov = -this.xMov;
+            }else{
+              this.yMov = -this.yMov;
+            }
+            b.status = 0;
+            this.score++;
+            this.checkEnd();
         }
       }
     }
@@ -131,13 +166,6 @@ export const FillCanvas = function(){
     }
   }
 
-  this.drawScore = function() {
-    this.ctx.beginPath();
-    this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Score: " + this.score, 8, 20);
-    this.ctx.closePath();
-  }
 
   this.drawLives = function() {
     this.ctx.font = "16px Arial";
@@ -170,7 +198,9 @@ export const FillCanvas = function(){
   this.animate = this.animate.bind(this);
   // this.keyDownHandler = this.keyDownHandler.bind(this);
   // this.keyUpHandler = this.keyUpHandler.bind(this);
-  this.mouseMoveHandler = this.mouseMoveHandler.bind(this);  
+  this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
+  this.brickCollisionDetection = this.brickCollisionDetection.bind(this);
+  this.drawBricks = this.drawBricks.bind(this);
   
 }
 
