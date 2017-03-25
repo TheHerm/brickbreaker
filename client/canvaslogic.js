@@ -117,49 +117,78 @@ export const FillCanvas = function(){
     }
   }
 
-  this.checkXCollision = function(b){
-    return (this.xPos+this.ballRadius) > b.x 
-          && (this.xPos-this.ballRadius) < (b.x+this.brickWidth)
-  }
-
-  this.checkYCollision = function(b){
-    return ( (this.yPos-this.ballRadius) > b.y || (this.yPos+this.ballRadius) > b.y )
-            && (this.yPos+this.ballRadius) < (b.y+this.brickHeight+2*this.ballRadius)
-  }
-
   this.brickCollisionDetection = function() {
-    // let yCol, xCol, brick;
-    // for(let c=0; c<this.brickColumnCount; c++) {
-    //   for(let r=0; r<this.brickRowCount; r++) {
-    //     brick = this.bricks[c][r];
-    //     yCol = this.checkYCollision(this.bricks[c][r]);
-    //     xCol = this.checkXCollision(this.bricks[c][r]);
-    //     if(brick.status && xCol && yCol){
-    //         if( ( this.xPos+this.ballRadius >= brick.x && this.xPos-this.ballRadius < (brick.x-this.ballRadius) + 2 )
-    //            || ( this.xPos-this.ballRadius <= brick.x+this.brickWidth && this.xPos+this.ballRadius > (brick.x+this.brickWidth+2*this.ballRadius) - 2)
-    //            && (this.yPos-this.ballRadius <= (brick.y+this.brickHeight) - 2*this.ballRadius
-    //             || (this.yPos+this.ballRadius >= brick.y+this.ballRadius && this.yPos+this.ballRadius <= brick.y+this.brickHeight+2*this.ballRadius) ) 
-    //         ){
-    //           this.xMov = -this.xMov;
-    //         }else{
-    //           this.yMov = -this.yMov;
-    //         }
-    //         brick.status = 0;
-    //         this.score++;
-    //         this.checkEnd();
-    //     }
-    //   }
-    // }
     let edges = this.findCircleEdges(this.xPos, this.yPos);
-    switch(this.checkCircleEdgesForCollision(edges)){
-      case 'top':
-        this.yMov = -this.yMov;
-      case 'bottom':
-        this.yMov = -this.yMov;
-      case 'left':
-        this.xMov = -this.xMov;
-      case 'left':
-        this.xMov = -this.xMov;
+    console.log(edges)
+    edges = this.checkCircleEdgesForCollision(edges)
+    if(edges){
+      switch(edges.bounceSide){
+        case 'top': {
+          this.yMov = -this.yMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'bottom': {
+          this.yMov = -this.yMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'left': {
+          this.xMov = -this.xMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'left': {
+          this.xMov = -this.xMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'topLeft': {
+          this.yMov = -this.yMov;
+          this.xMov = -this.xMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'topRight': {
+          this.xMov = -this.xMov;
+          this.yMov = -this.yMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'bottomLeft': {
+          this.xMov = -this.xMov;
+          this.yMov = -this.yMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        case 'bottomRight': {
+          this.xMov = -this.xMov;
+          this.yMov = -this.yMov;
+          this.removeBrick(edges.coord);
+          break;
+        }
+        default:
+          break;
+      }
+    }
+    return;
+  }
+
+  this.removeBrick = function(coord){
+    let brick;
+    for(let c=0; c<this.brickColumnCount; c++) {
+      for(let r=0; r<this.brickRowCount; r++) {
+        brick = this.bricks[c][r];
+        if(brick.status 
+            && coord[0] >= brick.x && coord[0] <= brick.x+this.brickWidth
+              && coord[1] >= brick.y && coord[1] <= brick.y+this.brickHeight){
+
+              brick.status = 0;
+              this.score++;
+              this.checkEnd();
+              return;
+          }
+      }
     }
   }
 
@@ -167,45 +196,72 @@ export const FillCanvas = function(){
     let sides = Object.keys(edges);
     for(let i=0; i<sides.length; i++){
       for(let j=0; j<5; j++){
+        console.log(edges)
         if(this.ctx.getImageData(edges[sides[i]][j][0], edges[sides[i]][j][1], 1, 1).data[3] !== 252){
-          return sides[i]+"";
+          console.log('*********')
+          console.log(sides[i]);
+          return {
+            bounceSide: sides[i] + "",
+            coord: edges[sides[i]][j]
+          }
         }
       }
     }
-    return;
+    return null;
   }
 
   this.findCircleEdges = function(x, y){
     let pixel = [0,0]
     let yTransform, xTransform;
     let edges = {
-      topLeft: new Array(5),
-      top: new Array(5),
-      topRight: new Array(5),
-      right: new Array(5),
-      bottomRight: new Array(5),
-      bottom: new Array(5),
-      bottomLeft: new Array(5),
-      left: new Array(5)
+      topLeft: new Array(3),
+      top: new Array(7),
+      topRight: new Array(3),
+      right: new Array(7),
+      bottomRight: new Array(3),
+      bottom: new Array(7),
+      bottomLeft: new Array(3),
+      left: new Array(7)
     };
-    for(let i = -2; i<3; i++){
-      edges.top[i+2] = [(x+i), (y+this.ballRadius-2)];
-      edges.bottom[i+2] = [(x+i), (y-this.ballRadius+2)];
-      edges.right[i+2] = [(x+this.ballRadius-2), (y+i)];
-      edges.left[i+2] = [(x-this.ballRadius+2), (y+i)];
+    for(let i = -3; i<4; i++){
+      edges.bottom[i+3] = [(x+i), (y+this.ballRadius-1)];
+      edges.top[i+3] = [(x+i), (y-this.ballRadius+1)];
+      edges.right[i+3] = [(x+this.ballRadius-1), (y+i)];
+      edges.left[i+3] = [(x-this.ballRadius+1), (y+i)];
+      if(i<-1 || i>1) {
+        yTransform = y - 2 + this.ballRadius / 2;
+        xTransform = x - 2 + this.ballRadius / 2;
+        edges.bottomRight[i+3] = [xTransform+i, yTransform-i];
+
+        yTransform = y + 2 - this.ballRadius / 2;
+        xTransform = x - 2 + this.ballRadius / 2;
+        edges.topRight[i+3] = [xTransform+i, yTransform-i];
+        
+        yTransform = y + 2 - this.ballRadius / 2;
+        xTransform = x + 2 - this.ballRadius / 2;
+        edges.topLeft[i+3] = [xTransform+i, yTransform-i];
+        
+        yTransform = y - 2 + this.ballRadius / 2;
+        xTransform = x + 2 - this.ballRadius / 2;
+        edges.bottomLeft[i+3] = [xTransform+i, yTransform-i];
+      }
       yTransform = y - 2 + this.ballRadius / 2;
       xTransform = x - 2 + this.ballRadius / 2;
-      edges.bottomRight[i+2] = [xTransform+i, yTransform-i];
+      edges.bottomRight[i+3] = [xTransform+i, yTransform-i];
+
       yTransform = y + 2 - this.ballRadius / 2;
       xTransform = x - 2 + this.ballRadius / 2;
-      edges.topRight[i+2] = [xTransform+i, yTransform-i];
+      edges.topRight[i+3] = [xTransform+i, yTransform-i];
+      
       yTransform = y + 2 - this.ballRadius / 2;
       xTransform = x + 2 - this.ballRadius / 2;
-      edges.topLeft[i+2] = [xTransform+i, yTransform-i];
+      edges.topLeft[i+3] = [xTransform+i, yTransform-i];
+      
       yTransform = y - 2 + this.ballRadius / 2;
       xTransform = x + 2 - this.ballRadius / 2;
-      edges.bottomLeft[i+2] = [xTransform+i, yTransform-i];
+      edges.bottomLeft[i+3] = [xTransform+i, yTransform-i];
     }
+    console.log(edges);
     return edges;
   }
 
@@ -234,15 +290,15 @@ export const FillCanvas = function(){
   }
 
   this.animate = function(){
-    this.brickCollisionDetection();
-    this.wallCollisionDetection();
-    this.bottomAndPaddleCollisionDetection();
     if(this.endGame){
       return;
     }else if(!this.endGame) {
       this.draw();
       requestAnimationFrame(this.animate);
     }
+    this.brickCollisionDetection();
+    // this.wallCollisionDetection();
+    // this.bottomAndPaddleCollisionDetection();
   }
 
   this.draw = function() {
