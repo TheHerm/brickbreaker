@@ -4,8 +4,8 @@ export const FillCanvas = function(){
   this.ctx = this.canvas.getContext('2d');
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 30;
-  this.xMov = 2;
-  this.yMov = -2;
+  this.xMov = 1;
+  this.yMov = -1;
   this.ballRadius = 10;
   this.paddleHeight = 10;
   this.paddleWidth = 75;
@@ -23,7 +23,16 @@ export const FillCanvas = function(){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-
+  this.edges = {
+    top: new Array(21),
+    left: new Array(21),
+    right: new Array(21),
+    bottom: new Array(21),
+    topLeft: [],
+    topRight: [],
+    bottomRight: [],
+    bottomLeft: []
+  };
   this.startGame = function(){
     for(let c=0; c<this.brickColumnCount; c++) {
       this.bricks[c] = [];
@@ -36,7 +45,20 @@ export const FillCanvas = function(){
     document.addEventListener("mousemove", this.mouseMoveHandler, false);
     this.animate();
   }
-
+  this.stopGame = function(){
+    this.endGame = true;
+  }
+  this.mouseMoveHandler = function(e) {
+    let relativeX = e.clientX - this.canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < this.canvas.width) {
+      this.paddleX = relativeX - this.paddleWidth/2;
+    }
+  }
+  this.drawLives = function() {
+    this.ctx.font = "16px Arial";
+    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillText("Lives: " + this.lives, this.canvas.width-65, 20);
+  }
   this.drawScore = function() {
     this.ctx.beginPath();
     this.ctx.font = "16px Arial";
@@ -44,7 +66,6 @@ export const FillCanvas = function(){
     this.ctx.fillText("Score: " + this.score, 8, 20);
     this.ctx.closePath();
   }
-
   this.drawBricks = function() {
     let count = 0;
     for(let c=0; c<this.brickColumnCount; c++) {
@@ -68,7 +89,6 @@ export const FillCanvas = function(){
       }
     }
   }
-
   this.drawBall = function(){
     this.ctx.beginPath();
     this.ctx.arc(this.xPos, this.yPos, this.ballRadius, 0, Math.PI*2);
@@ -77,8 +97,20 @@ export const FillCanvas = function(){
     this.ctx.fill();
     this.ctx.globalAlpha=1;    
     this.ctx.closePath();
-  }
 
+    let sides = Object.keys(this.edges);
+    if(this.edges[sides[0]][0]){
+      for(let i=0; i<sides.length; i++){
+        for(let j=0; j<this.edges[sides[i]].length; j++){
+          this.ctx.beginPath();
+          this.ctx.rect(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1);
+          this.ctx.fillStyle = 'black';
+          this.ctx.fill();
+          this.ctx.closePath();
+        }
+      }
+    }
+  }
   this.drawPaddle = function() {
     this.ctx.beginPath();
     this.ctx.rect(this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth, this.paddleHeight);
@@ -86,25 +118,27 @@ export const FillCanvas = function(){
     this.ctx.fill();
     this.ctx.closePath();
   }
-
-
-  this.mouseMoveHandler = function(e) {
-    let relativeX = e.clientX - this.canvas.offsetLeft;
-    if(relativeX > 0 && relativeX < this.canvas.width) {
-      this.paddleX = relativeX - this.paddleWidth/2;
-    }
+  this.draw = function() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.xPos += this.xMov;
+    this.yPos += this.yMov;
+    this.drawScore();
+    this.drawLives();
+    this.drawBall();
+    this.drawBricks();
+    this.drawPaddle();
   }
-
-  this.wallCollisionDetection = function(){
-    if((this.xPos-this.ballRadius+2) + this.xMov < 0 
-        || (this.xPos+this.ballRadius-2) + this.xMov > this.canvas.width){
-          this.xMov = -this.xMov;
+  this.animate = function(){
+    if(this.endGame){
+      return;
+    }else if(!this.endGame) {
+      this.draw();
+      requestAnimationFrame(this.animate);
     }
-    if((this.yPos-this.ballRadius+2) + this.yMov < 0){
-      this.yMov = -this.yMov;
-    }
+    this.collisionDetection();
+    // this.wallCollisionDetection();
+    // this.bottomAndPaddleCollisionDetection();
   }
-
   this.checkEnd = function(){
     if(this.score == this.brickRowCount*this.brickColumnCount) {
       this.endGame = true;
@@ -116,11 +150,24 @@ export const FillCanvas = function(){
       document.location.reload();
     }
   }
+  this.removeBrick = function(coord){
+    let brick;
+    for(let c=0; c<this.brickColumnCount; c++) {
+      for(let r=0; r<this.brickRowCount; r++) {
+        brick = this.bricks[c][r];
+        if(brick.status && coord[0] >= brick.x && coord[0] <= brick.x+this.brickWidth && coord[1] >= brick.y && coord[1] <= brick.y+this.brickHeight){
+          brick.status = 0;
+          this.score++;
+          this.checkEnd();
+          return;
+        }
+      }
+    }
+  }
 
-  this.brickCollisionDetection = function() {
-    let edges = this.findCircleEdges(this.xPos, this.yPos);
-    console.log(edges)
-    edges = this.checkCircleEdgesForCollision(edges)
+  this.collisionDetection = function() {
+    this.findCircleEdges(this.xPos, this.yPos);
+    let edges = this.checkCircleEdgesForCollision()
     if(edges){
       switch(edges.bounceSide){
         case 'top': {
@@ -167,6 +214,26 @@ export const FillCanvas = function(){
           this.removeBrick(edges.coord);
           break;
         }
+        case 'sideWall': {
+          this.xMov = -this.xMov;
+          break;
+        }
+        case 'topWall': {
+          this.yMov = -this.yMov;
+          break;
+        }
+        case 'bottomWall': {
+          this.lives--;
+          this.checkEnd();
+          if(this.lives){
+            this.xPos = this.canvas.width / 2;
+            this.yPos = this.canvas.height-30;
+            this.xMov = 1;
+            this.yMov = -1;
+            this.paddleX = (this.canvas.width-this.paddleWidth) / 2;
+          }
+          break;
+        }
         default:
           break;
       }
@@ -174,35 +241,31 @@ export const FillCanvas = function(){
     return;
   }
 
-  this.removeBrick = function(coord){
-    let brick;
-    for(let c=0; c<this.brickColumnCount; c++) {
-      for(let r=0; r<this.brickRowCount; r++) {
-        brick = this.bricks[c][r];
-        if(brick.status 
-            && coord[0] >= brick.x && coord[0] <= brick.x+this.brickWidth
-              && coord[1] >= brick.y && coord[1] <= brick.y+this.brickHeight){
-
-              brick.status = 0;
-              this.score++;
-              this.checkEnd();
-              return;
-          }
-      }
-    }
-  }
-
-  this.checkCircleEdgesForCollision = function(edges){
-    let sides = Object.keys(edges);
+  this.checkCircleEdgesForCollision = function(){
+    let sides = Object.keys(this.edges);
     for(let i=0; i<sides.length; i++){
-      for(let j=0; j<5; j++){
-        console.log(edges)
-        if(this.ctx.getImageData(edges[sides[i]][j][0], edges[sides[i]][j][1], 1, 1).data[3] !== 252){
-          console.log('*********')
-          console.log(sides[i]);
+      for(let j=0; j<this.edges[sides[i]].length; j++){
+        if(!this.edges[sides[i]][j][0]) continue;
+        if(this.edges[sides[i]][j][0]<=0 || this.edges[sides[i]][j][0]>=this.canvas.width){
+          return {
+            bounceSide: "sideWall",
+            coord: this.edges[sides[i]][j]
+          }
+        }else if(this.edges[sides[i]][j][1]<=0){
+          return {
+            bounceSide: "topWall",
+            coord: this.edges[sides[i]][j]
+          }
+        }else if(this.edges[sides[i]][j][1]>=this.canvas.height){
+          return {
+            bounceSide: "bottomWall",
+            coord: this.edges[sides[i]][j]
+          }
+        }else if(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[3] !== 252){
+          console.log('*********', sides[i]);
           return {
             bounceSide: sides[i] + "",
-            coord: edges[sides[i]][j]
+            coord: this.edges[sides[i]][j]
           }
         }
       }
@@ -211,123 +274,47 @@ export const FillCanvas = function(){
   }
 
   this.findCircleEdges = function(x, y){
-    let pixel = [0,0]
-    let yTransform, xTransform;
-    let edges = {
-      topLeft: new Array(3),
-      top: new Array(7),
-      topRight: new Array(3),
-      right: new Array(7),
-      bottomRight: new Array(3),
-      bottom: new Array(7),
-      bottomLeft: new Array(3),
-      left: new Array(7)
-    };
-    for(let i = -3; i<4; i++){
-      edges.bottom[i+3] = [(x+i), (y+this.ballRadius-1)];
-      edges.top[i+3] = [(x+i), (y-this.ballRadius+1)];
-      edges.right[i+3] = [(x+this.ballRadius-1), (y+i)];
-      edges.left[i+3] = [(x-this.ballRadius+1), (y+i)];
-      if(i<-1 || i>1) {
-        yTransform = y - 2 + this.ballRadius / 2;
-        xTransform = x - 2 + this.ballRadius / 2;
-        edges.bottomRight[i+3] = [xTransform+i, yTransform-i];
+    let xTransformLeft = x - (this.ballRadius / 2);
+    let xTransformRight = x + (this.ballRadius / 2);
+    let yTransformDown = y + (this.ballRadius / 2);
+    let yTransformUp = y - (this.ballRadius / 2);
+    this.edges.topLeft[0] = [xTransformLeft, yTransformUp];
+    this.edges.bottomLeft[0] = [xTransformLeft, yTransformDown];
+    this.edges.bottomRight[0] = [xTransformRight, yTransformDown];
+    this.edges.topRight[0] = [xTransformRight, yTransformUp];
 
-        yTransform = y + 2 - this.ballRadius / 2;
-        xTransform = x - 2 + this.ballRadius / 2;
-        edges.topRight[i+3] = [xTransform+i, yTransform-i];
-        
-        yTransform = y + 2 - this.ballRadius / 2;
-        xTransform = x + 2 - this.ballRadius / 2;
-        edges.topLeft[i+3] = [xTransform+i, yTransform-i];
-        
-        yTransform = y - 2 + this.ballRadius / 2;
-        xTransform = x + 2 - this.ballRadius / 2;
-        edges.bottomLeft[i+3] = [xTransform+i, yTransform-i];
-      }
-      yTransform = y - 2 + this.ballRadius / 2;
-      xTransform = x - 2 + this.ballRadius / 2;
-      edges.bottomRight[i+3] = [xTransform+i, yTransform-i];
+    for(let i = -3; i<3; i++){
+      this.edges.bottom[i+3] = [(x+i), ( y+(this.ballRadius-2) )];
+      this.edges.bottom[i+8] = [(x+i), ( y+(this.ballRadius-3) )];
+      this.edges.bottom[i+13] = [(x+i), ( y+(this.ballRadius-4) )];
 
-      yTransform = y + 2 - this.ballRadius / 2;
-      xTransform = x - 2 + this.ballRadius / 2;
-      edges.topRight[i+3] = [xTransform+i, yTransform-i];
-      
-      yTransform = y + 2 - this.ballRadius / 2;
-      xTransform = x + 2 - this.ballRadius / 2;
-      edges.topLeft[i+3] = [xTransform+i, yTransform-i];
-      
-      yTransform = y - 2 + this.ballRadius / 2;
-      xTransform = x + 2 - this.ballRadius / 2;
-      edges.bottomLeft[i+3] = [xTransform+i, yTransform-i];
+      this.edges.top[i+3] = [(x+i), ( y-(this.ballRadius-2) )];
+      this.edges.top[i+8] = [(x+i), ( y-(this.ballRadius-3) )];
+      this.edges.top[i+13] = [(x+i), ( y-(this.ballRadius-4) )];
+
+      this.edges.right[i+3] = [( x+(this.ballRadius-2) ), (y+i)];
+      this.edges.right[i+8] = [( x+(this.ballRadius-3) ), (y+i)];
+      this.edges.right[i+13] = [( x+(this.ballRadius-4) ), (y+i)];
+
+      this.edges.left[i+3] = [( x-(this.ballRadius-2) ), (y+i)];
+      this.edges.left[i+8] = [( x-(this.ballRadius-3) ), (y+i)];
+      this.edges.left[i+13] = [( x-(this.ballRadius-4) ), (y+i)];
     }
-    console.log(edges);
-    return edges;
-  }
 
-  this.bottomAndPaddleCollisionDetection = function(){
-    if((this.yPos+this.ballRadius-2) > this.canvas.height) {
-      if(this.xPos > this.paddleX && this.xPos < this.paddleX + this.paddleWidth)   this.yMov = -this.yMov;
-      else {
-        this.lives--;
-        this.checkEnd();
-        if(this.lives){
-          this.xPos = this.canvas.width / 2;
-          this.yPos = this.canvas.height-30;
-          this.xMov = 5;
-          this.yMov = -5;
-          this.paddleX = (this.canvas.width-this.paddleWidth) / 2;
-        }
-      }
-    }
-  }
-
-
-  this.drawLives = function() {
-    this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fillText("Lives: " + this.lives, this.canvas.width-65, 20);
-  }
-
-  this.animate = function(){
-    if(this.endGame){
-      return;
-    }else if(!this.endGame) {
-      this.draw();
-      requestAnimationFrame(this.animate);
-    }
-    this.brickCollisionDetection();
-    // this.wallCollisionDetection();
-    // this.bottomAndPaddleCollisionDetection();
-  }
-
-  this.draw = function() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.xPos += this.xMov;
-    this.yPos += this.yMov;
-    this.drawScore();
-    this.drawLives();
-    this.drawBall();
-    this.drawBricks();
-    this.drawPaddle();
-  }
-
-  this.stopGame = function(){
-    this.endGame = true;
   }
 
   this.draw = this.draw.bind(this);
   this.animate = this.animate.bind(this);
-  // this.keyDownHandler = this.keyDownHandler.bind(this);
-  // this.keyUpHandler = this.keyUpHandler.bind(this);
   this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
-  this.brickCollisionDetection = this.brickCollisionDetection.bind(this);
+  this.collisionDetection = this.collisionDetection.bind(this);
   this.drawBricks = this.drawBricks.bind(this);
   this.drawBall = this.drawBall.bind(this);
   this.findCircleEdges = this.findCircleEdges.bind(this);
   this.checkCircleEdgesForCollision = this.checkCircleEdgesForCollision.bind(this);
 }
 
+  // this.keyDownHandler = this.keyDownHandler.bind(this);
+  // this.keyUpHandler = this.keyUpHandler.bind(this);
 
   // this.keyDownHandler = function(e) {
   //   if(e.keyCode == 39) {
