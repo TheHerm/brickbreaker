@@ -37,7 +37,7 @@ class CanvasContainer extends React.Component{
           !this.state.start && <div><button onClick={this.handleStartGame}>Start Game</button></div>
         }
         {
-          !!this.state.start && <div><button onClick={this.handleEndGame}>End Game</button></div>
+          !!this.state.start && <div><button onClick={this.handleEndGame}>Pause Game</button></div>
         }
       </div>
     )

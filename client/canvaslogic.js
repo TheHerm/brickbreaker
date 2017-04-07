@@ -34,17 +34,22 @@ export const FillCanvas = function(){
     bottomLeft: new Array(3).fill([])
   };
   this.startGame = function(){
-    for(let c=0; c<this.brickColumnCount; c++) {
-      this.bricks[c] = [];
-      for(let r=0; r<this.brickRowCount; r++) {
-        this.bricks[c][r] = { x: 0, y: 0, status: 1 };
+    if(this.endGame == false){
+      for(let c=0; c<this.brickColumnCount; c++) {
+        this.bricks[c] = [];
+        for(let r=0; r<this.brickRowCount; r++) {
+          this.bricks[c][r] = { x: 0, y: 0, status: 1 };
+        }
       }
+      // document.addEventListener("keydown", this.keyDownHandler, false);
+      // document.addEventListener("keyup", this.keyUpHandler, false);
+      document.addEventListener("mousemove", this.mouseMoveHandler, false);
+      this.setBallPixelArray(this.xPos, this.yPos);
+      this.animate();
+    }else {
+      this.endGame = false;
+      this.animate();
     }
-    // document.addEventListener("keydown", this.keyDownHandler, false);
-    // document.addEventListener("keyup", this.keyUpHandler, false);
-    document.addEventListener("mousemove", this.mouseMoveHandler, false);
-    this.setBallPixelArray(this.xPos, this.yPos);
-    this.animate();
   }
   this.setBallPixelArray = function(x, y){
     let xTransformLeft = x - (1+this.ballRadius / 2);
