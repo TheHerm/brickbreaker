@@ -24,10 +24,10 @@ export const FillCanvas = function(){
   this.lives = 3;
   this.endGame = false;
   this.edges = {
-    left: new Array(21).fill([]),
-    right: new Array(21).fill([]),
-    bottom: new Array(21).fill([]),
-    top: new Array(21).fill([]),
+    left: new Array(24).fill([]),
+    right: new Array(24).fill([]),
+    bottom: new Array(24).fill([]),
+    top: new Array(24).fill([]),
     topLeft: new Array(3).fill([]),
     topRight: new Array(3).fill([]),
     bottomRight: new Array(3).fill([]),
@@ -88,6 +88,13 @@ export const FillCanvas = function(){
       this.edges.left[i+3] = [( x-(this.ballRadius-2) ), (y+i)];
       this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
       this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
+
+      if(i>-2 && i<2){
+        this.edges.bottom[i+21] = [(x+i), ( y+(this.ballRadius-2) )];
+        this.edges.top[i+21] = [(x+i), ( y-(this.ballRadius-2) )];
+        this.edges.right[i+21] = [( x+(this.ballRadius-2) ), (y+i)];
+        this.edges.left[i+21] = [( x-(this.ballRadius-2) ), (y+i)];
+      }
     }
   }
   this.stopGame = function(){
@@ -227,7 +234,6 @@ export const FillCanvas = function(){
       }
     }
   }
-
   this.collisionDetection = function() {
     this.findCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
@@ -307,10 +313,14 @@ export const FillCanvas = function(){
 
   this.checkCircleEdgesForCollision = function(){
     let sides = Object.keys(this.edges);
-    for(let i=0; i<sides.length; i++){
-      for(let j=0; j<this.edges[sides[i]].length; j++){
-        if(!this.edges[sides[i]][j][0]) continue;
-        if(this.edges[sides[i]][j][0]<=0 || this.edges[sides[i]][j][0]>=this.canvas.width){
+    let len, i, j;
+    for(i=0; i<sides.length; i++){
+      len = this.edges[sides[i]].length;
+      for(j=0; j<len; j++){
+
+        if(!this.edges[sides[i]][j][0]){
+          continue;
+        }else if(this.edges[sides[i]][j][0]<=0 || this.edges[sides[i]][j][0]>=this.canvas.width){
           return {
             bounceSide: "sideWall",
             coord: this.edges[sides[i]][j]
@@ -326,12 +336,12 @@ export const FillCanvas = function(){
             coord: this.edges[sides[i]][j]
           }
         }else if(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[3] !== 252){
-          console.log('*********', sides[i], this.edges[sides[i]][j][0], this.edges[sides[i]][j][1]);
           return {
             bounceSide: sides[i] + "",
             coord: this.edges[sides[i]][j]
           }
         }
+
       }
     }
     return null;
@@ -347,7 +357,7 @@ export const FillCanvas = function(){
       this.edges.right[i][1] += this.yMov;
       this.edges.left[i][1] += this.yMov;
       this.edges.bottom[i][1] += this.yMov;
-      if(i>2) continue;
+      if(i >= this.edges.topRight.length) continue;
       this.edges.topRight[i][1] += this.yMov;
       this.edges.topLeft[i][1] += this.yMov;
       this.edges.bottomRight[i][1] += this.yMov;
