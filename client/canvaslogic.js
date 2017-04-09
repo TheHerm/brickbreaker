@@ -291,6 +291,11 @@ export const FillCanvas = function(){
           this.yMov = -this.yMov;
           break;
         }
+        case 'paddle': {
+          this.paddleRebound(edges.coord[0]);
+          console.log("X_ _Y --->>[", this.xMov, ", ", this.yMov, "]")
+          break;
+        }
         case 'bottomWall': {
           this.lives--;
           this.checkEnd();
@@ -309,6 +314,46 @@ export const FillCanvas = function(){
       }
     }
     return;
+  }
+
+  this.yPaddleRebound = function(){
+    if(this.yMov >= 0){
+      this.yMov = -(this.yMov + .05);
+    }else{
+      this.yMov = (-this.yMov) + .05;
+    }
+  }
+
+  this.paddleRebound = function(xCoord){
+    let paddlePercent = (xCoord - this.paddleX) / this.paddleWidth;
+    let incommingX = this.xMov;
+
+    if(paddlePercent >= .50){
+      paddlePercent = (2 * paddlePercent) - 1 + Math.pow(paddlePercent, 2);
+      this.xMov = incommingX + paddlePercent;
+      this.yPaddleRebound();
+    }else{
+      paddlePercent = 1 - paddlePercent;
+      paddlePercent = (2 * paddlePercent) - 1 + Math.pow(paddlePercent, 2);
+      this.xMov = incommingX - paddlePercent;
+      this.yPaddleRebound();
+    }
+
+    // if(incommingX >= 0){
+    //   if(paddlePercent <= 30){
+
+    //   }else if(paddlePercent >= 70){
+    //     this.xMov = 
+    //   }else{
+    //     this.xMov = -incommingX;
+    //   }
+    // }else{
+    //   if(paddlePercent >= 33 && paddlePercent <= 66){
+    //     this.xMov = -incommingX;
+    //   }else{
+        
+    //   }
+    // }
   }
 
   this.checkCircleEdgesForCollision = function(){
@@ -336,12 +381,18 @@ export const FillCanvas = function(){
             coord: this.edges[sides[i]][j]
           }
         }else if(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[3] !== 252){
-          return {
-            bounceSide: sides[i] + "",
-            coord: this.edges[sides[i]][j]
+          if(this.edges[sides[i]][j][1]>=this.canvas.height-this.paddleHeight){
+            return {
+              bounceSide: "paddle",
+              coord: this.edges[sides[i]][j]
+            }
+          }else{
+            return {
+              bounceSide: sides[i] + "",
+              coord: this.edges[sides[i]][j]
+            }
           }
         }
-
       }
     }
     return null;
