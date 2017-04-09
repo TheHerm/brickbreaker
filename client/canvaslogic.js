@@ -14,11 +14,11 @@ export const FillCanvas = function(){
   this.leftPressed = false;
   this.brickRowCount = 3;
   this.brickColumnCount = 7;
-  this.brickWidth = 50;
-  this.brickHeight = 50;
-  this.brickPadding = 30;
-  this.brickOffsetTop = 100;
-  this.brickOffsetLeft = 70;
+  this.brickWidth = 70;
+  this.brickHeight = 25;
+  this.brickPadding = 22;
+  this.brickOffsetTop = 50;
+  this.brickOffsetLeft = 33;
   this.bricks = [];
   this.score = 0;
   this.lives = 3;
@@ -293,7 +293,6 @@ export const FillCanvas = function(){
         }
         case 'paddle': {
           this.paddleRebound(edges.coord[0]);
-          console.log("X_ _Y --->>[", this.xMov, ", ", this.yMov, "]")
           break;
         }
         case 'bottomWall': {
@@ -303,8 +302,8 @@ export const FillCanvas = function(){
             this.xPos = this.canvas.width / 2;
             this.yPos = this.canvas.height-30;
             this.setBallPixelArray(this.xPos, this.yPos)
-            this.xMov = 2;
-            this.yMov = -2;
+            this.xMov = 3;
+            this.yMov = -(Math.abs(this.yMov) * .80);
             this.paddleX = (this.canvas.width-this.paddleWidth) / 2;
           }
           break;
@@ -318,9 +317,9 @@ export const FillCanvas = function(){
 
   this.yPaddleRebound = function(){
     if(this.yMov >= 0){
-      this.yMov = -(this.yMov + .05);
+      this.yMov = -(this.yMov + .1);
     }else{
-      this.yMov = (-this.yMov) + .05;
+      this.yMov = (-this.yMov) + .1;
     }
   }
 
@@ -338,22 +337,6 @@ export const FillCanvas = function(){
       this.xMov = incommingX - paddlePercent;
       this.yPaddleRebound();
     }
-
-    // if(incommingX >= 0){
-    //   if(paddlePercent <= 30){
-
-    //   }else if(paddlePercent >= 70){
-    //     this.xMov = 
-    //   }else{
-    //     this.xMov = -incommingX;
-    //   }
-    // }else{
-    //   if(paddlePercent >= 33 && paddlePercent <= 66){
-    //     this.xMov = -incommingX;
-    //   }else{
-        
-    //   }
-    // }
   }
 
   this.checkCircleEdgesForCollision = function(){
