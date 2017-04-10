@@ -247,11 +247,13 @@ export const FillCanvas = function(){
   }
   this.bounce = function(str){
     if(str[0] === 'x'){
-      this.xPos += Math.abs(this.xMov) * str.slice(1);
+      this.xPos += (Math.abs(this.xMov) + 2) * str.slice(1);
       this.xMov = -this.xMov;
+      this.setBallPixelArray(this.xPos, this.yPos);
     }else if(str[0] === 'y'){
-      this.yPos += Math.abs(this.yMov) * str.slice(1);
+      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
       this.yMov = -this.yMov;
+      this.setBallPixelArray(this.xPos, this.yPos);
     }else if(str[0] === 'z'){
       this.yMov = -this.yMov;
       this.xMov = -this.xMov;
@@ -261,6 +263,7 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
+      console.log("---",edges.bounceSide,"---");
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y01');
@@ -358,6 +361,9 @@ export const FillCanvas = function(){
   this.checkCircleEdgesForCollision = function(){
     let sides = Object.keys(this.edges);
     let len, i, j;
+    if( (this.yPos < this.canvas.height-this.paddleHeight-20 && this.yPos > this.canvas.height/2) 
+      && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
+    
     for(i=0; i<sides.length; i++){
       len = this.edges[sides[i]].length;
       for(j=0; j<len; j++){
@@ -384,7 +390,7 @@ export const FillCanvas = function(){
         this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[0] !== 80
         && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[1] !== 244
         && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[2] !== 66) {
-
+          
           if(this.edges[sides[i]][j][1]>=this.canvas.height-this.paddleHeight){
             return {
               bounceSide: "paddle",
