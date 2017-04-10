@@ -257,6 +257,9 @@ export const FillCanvas = function(){
     }else if(str[0] === 'z'){
       this.yMov = -this.yMov;
       this.xMov = -this.xMov;
+    }else if(str[0] === 'p'){
+      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
+      this.setBallPixelArray(this.xPos, this.yPos);
     }
   }
   this.collisionDetection = function() {
@@ -310,11 +313,11 @@ export const FillCanvas = function(){
           break;
         }
         case 'topWall': {
-          this.yMov = -this.yMov;
+          this.bounce('y01');
           break;
         }
         case 'paddle': {
-          this.bounce('y-1');
+          this.bounce('p');
           this.paddleRebound(edges.coord[0]);
           break;
         }
@@ -337,11 +340,7 @@ export const FillCanvas = function(){
     return;
   }
   this.yPaddleRebound = function(){
-    if(this.yMov >= 0){
-      this.yMov = -(this.yMov + .1);
-    }else{
-      this.yMov = (-this.yMov) + .1;
-    }
+    this.yMov = -(Math.abs(this.yMov) + .1);
   }
   this.paddleRebound = function(xCoord){
     let paddlePercent = (xCoord - this.paddleX) / this.paddleWidth;
@@ -359,11 +358,11 @@ export const FillCanvas = function(){
     }
   }
   this.checkCircleEdgesForCollision = function(){
-    let sides = Object.keys(this.edges);
-    let len, i, j;
     if( (this.yPos < this.canvas.height-this.paddleHeight-20 && this.yPos > this.canvas.height/2) 
       && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
-    
+
+    let sides = Object.keys(this.edges);
+    let len, i, j;
     for(i=0; i<sides.length; i++){
       len = this.edges[sides[i]].length;
       for(j=0; j<len; j++){
