@@ -1,14 +1,17 @@
 
 export const FillCanvas = function(){
+
+/*---------------- VARIABLES ----------------- */
+
   this.canvas = document.getElementById('myCanvas');
   this.ctx = this.canvas.getContext('2d');
   this.xPos = this.canvas.width / 2;
-  this.yPos = this.canvas.height - 30;
+  this.yPos = this.canvas.height - 70;
   this.xMov = 3;
   this.yMov = -3;
   this.ballRadius = 10;
-  this.paddleHeight = 10;
-  this.paddleWidth = 75;
+  this.paddleHeight = 38;
+  this.paddleWidth = 90;
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
   this.rightPressed = false;
   this.leftPressed = false;
@@ -33,6 +36,11 @@ export const FillCanvas = function(){
     bottomRight: new Array(3).fill([]),
     bottomLeft: new Array(3).fill([])
   };
+
+/*---------------- FUNCTIONS ----------------- */
+
+    /*--- START STOP SETUP STATS --- */
+
   this.startGame = function(){
     if(this.endGame == false){
       for(let c=0; c<this.brickColumnCount; c++) {
@@ -49,6 +57,26 @@ export const FillCanvas = function(){
     }else {
       this.endGame = false;
       this.animate();
+    }
+  }
+  this.stopGame = function(){
+    this.endGame = true;
+  }
+  this.checkEnd = function(){
+    if(this.score == this.brickRowCount*this.brickColumnCount) {
+      this.endGame = true;
+      alert("YOU WIN, CONGRATULATIONS!");
+      document.location.reload();
+    }else if(!this.lives) {
+      this.endGame = true;
+      alert("GAME OVER");
+      document.location.reload();
+    }
+  }
+  this.mouseMoveHandler = function(e) {
+    let relativeX = e.clientX - this.canvas.offsetLeft;
+    if(relativeX > 0 && relativeX < this.canvas.width) {
+      this.paddleX = relativeX - this.paddleWidth/2;
     }
   }
   this.setBallPixelArray = function(x, y){
@@ -97,14 +125,27 @@ export const FillCanvas = function(){
       }
     }
   }
-  this.stopGame = function(){
-    this.endGame = true;
-  }
-  this.mouseMoveHandler = function(e) {
-    let relativeX = e.clientX - this.canvas.offsetLeft;
-    if(relativeX > 0 && relativeX < this.canvas.width) {
-      this.paddleX = relativeX - this.paddleWidth/2;
+  this.animate = function(){
+    if(this.endGame){
+      return;
+    }else if(!this.endGame) {
+      this.draw();
+      this.collisionDetection();
+      requestAnimationFrame(this.animate);
     }
+  }
+
+    /*--- DRAW --- */
+  
+  this.draw = function() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.xPos += this.xMov;
+    this.yPos += this.yMov;
+    this.drawScore();
+    this.drawLives();
+    this.drawBall();
+    this.drawPaddle();
+    this.drawBricks();
   }
   this.drawLives = function() {
     this.ctx.beginPath();
@@ -156,10 +197,8 @@ export const FillCanvas = function(){
   this.drawBall = function(){
     this.ctx.beginPath();
     this.ctx.arc(this.xPos, this.yPos, this.ballRadius, 0, Math.PI*2);
-    this.ctx.globalAlpha=.99;
-    this.ctx.fillStyle = '#0095DD';
+    this.ctx.fillStyle = 'rgb(80, 244, 66)';
     this.ctx.fill();
-    this.ctx.globalAlpha=1;    
     this.ctx.closePath();
 
     // let sides = Object.keys(this.edges);
@@ -184,42 +223,14 @@ export const FillCanvas = function(){
     // }
   }
   this.drawPaddle = function() {
-    this.ctx.beginPath();
-    this.ctx.rect(this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth, this.paddleHeight);
-    this.ctx.fillStyle = "#0095DD";
-    this.ctx.fill();
-    this.ctx.closePath();
+    let drawing = new Image() 
+    drawing.src = "Spaceship.png" 
+    this.ctx.drawImage(drawing, this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
-  this.draw = function() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.xPos += this.xMov;
-    this.yPos += this.yMov;
-    this.drawScore();
-    this.drawLives();
-    this.drawBall();
-    this.drawPaddle();
-    this.drawBricks();
-  }
-  this.animate = function(){
-    if(this.endGame){
-      return;
-    }else if(!this.endGame) {
-      this.draw();
-      this.collisionDetection();
-      requestAnimationFrame(this.animate);
-    }
-  }
-  this.checkEnd = function(){
-    if(this.score == this.brickRowCount*this.brickColumnCount) {
-      this.endGame = true;
-      alert("YOU WIN, CONGRATULATIONS!");
-      document.location.reload();
-    }else if(!this.lives) {
-      this.endGame = true;
-      alert("GAME OVER");
-      document.location.reload();
-    }
-  }
+  
+    /*--- COLLISION --- */
+  
+  
   this.removeBrick = function(coord){
     let brick;
     for(let c=0; c<this.brickColumnCount; c++) {
@@ -234,52 +245,60 @@ export const FillCanvas = function(){
       }
     }
   }
+  this.bounce = function(str){
+    if(str[0] === 'x'){
+      this.xPos += Math.abs(this.xMov) * str.slice(1);
+      this.xMov = -this.xMov;
+    }else if(str[0] === 'y'){
+      this.yPos += Math.abs(this.yMov) * str.slice(1);
+      this.yMov = -this.yMov;
+    }else if(str[0] === 'z'){
+      this.yMov = -this.yMov;
+      this.xMov = -this.xMov;
+    }
+  }
   this.collisionDetection = function() {
-    this.findCircleEdges(this.xPos, this.yPos);
+    this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
       switch(edges.bounceSide){
         case 'top': {
-          this.yMov = -this.yMov;
+          this.bounce('y01');
           this.removeBrick(edges.coord);
           break;
         }
         case 'bottom': {
-          this.yMov = -this.yMov;
+          this.bounce('y-1');
           this.removeBrick(edges.coord);
           break;
         }
         case 'left': {
-          this.xMov = -this.xMov;
+          this.bounce('x01');
           this.removeBrick(edges.coord);
           break;
         }
         case 'right': {
-          this.xMov = -this.xMov;
+          this.bounce('x-1');
           this.removeBrick(edges.coord);
           break;
         }
         case 'topLeft': {
-          this.yMov = -this.yMov;
-          this.xMov = -this.xMov;
+          this.bounce('z');
           this.removeBrick(edges.coord);
           break;
         }
         case 'topRight': {
-          this.xMov = -this.xMov;
-          this.yMov = -this.yMov;
+          this.bounce('z');
           this.removeBrick(edges.coord);
           break;
         }
         case 'bottomLeft': {
-          this.xMov = -this.xMov;
-          this.yMov = -this.yMov;
+          this.bounce('z');
           this.removeBrick(edges.coord);
           break;
         }
         case 'bottomRight': {
-          this.xMov = -this.xMov;
-          this.yMov = -this.yMov;
+          this.bounce('z');
           this.removeBrick(edges.coord);
           break;
         }
@@ -292,6 +311,7 @@ export const FillCanvas = function(){
           break;
         }
         case 'paddle': {
+          this.bounce('y-1');
           this.paddleRebound(edges.coord[0]);
           break;
         }
@@ -300,11 +320,10 @@ export const FillCanvas = function(){
           this.checkEnd();
           if(this.lives){
             this.xPos = this.canvas.width / 2;
-            this.yPos = this.canvas.height-30;
+            this.yPos = this.canvas.height-70;
             this.setBallPixelArray(this.xPos, this.yPos)
             this.xMov = 3;
             this.yMov = -(Math.abs(this.yMov) * .80);
-            this.paddleX = (this.canvas.width-this.paddleWidth) / 2;
           }
           break;
         }
@@ -314,7 +333,6 @@ export const FillCanvas = function(){
     }
     return;
   }
-
   this.yPaddleRebound = function(){
     if(this.yMov >= 0){
       this.yMov = -(this.yMov + .1);
@@ -322,7 +340,6 @@ export const FillCanvas = function(){
       this.yMov = (-this.yMov) + .1;
     }
   }
-
   this.paddleRebound = function(xCoord){
     let paddlePercent = (xCoord - this.paddleX) / this.paddleWidth;
     let incommingX = this.xMov;
@@ -338,7 +355,6 @@ export const FillCanvas = function(){
       this.yPaddleRebound();
     }
   }
-
   this.checkCircleEdgesForCollision = function(){
     let sides = Object.keys(this.edges);
     let len, i, j;
@@ -358,12 +374,17 @@ export const FillCanvas = function(){
             bounceSide: "topWall",
             coord: this.edges[sides[i]][j]
           }
+
         }else if(this.edges[sides[i]][j][1]>=this.canvas.height){
           return {
             bounceSide: "bottomWall",
             coord: this.edges[sides[i]][j]
           }
-        }else if(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[3] !== 252){
+        }else if(
+        this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[0] !== 80
+        && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[1] !== 244
+        && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[2] !== 66) {
+
           if(this.edges[sides[i]][j][1]>=this.canvas.height-this.paddleHeight){
             return {
               bounceSide: "paddle",
@@ -375,13 +396,13 @@ export const FillCanvas = function(){
               coord: this.edges[sides[i]][j]
             }
           }
+
         }
       }
     }
     return null;
   }
-
-  this.findCircleEdges = function(x, y){
+  this.moveCircleEdges = function(x, y){
     for(let i=0; i<this.edges.top.length; i++){
       this.edges.top[i][0] += this.xMov;
       this.edges.right[i][0] += this.xMov;
@@ -404,15 +425,21 @@ export const FillCanvas = function(){
     
   }
 
+  /*---------------- BINDINGS ----------------- */
+  
   this.draw = this.draw.bind(this);
   this.animate = this.animate.bind(this);
   this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
   this.collisionDetection = this.collisionDetection.bind(this);
   this.drawBricks = this.drawBricks.bind(this);
   this.drawBall = this.drawBall.bind(this);
-  this.findCircleEdges = this.findCircleEdges.bind(this);
+  this.moveCircleEdges = this.moveCircleEdges.bind(this);
   this.checkCircleEdgesForCollision = this.checkCircleEdgesForCollision.bind(this);
+  this.bounce = this.bounce.bind(this);
 }
+
+  /*-------------------- NOTES ------------------------------- */
+
 
   // this.keyDownHandler = this.keyDownHandler.bind(this);
   // this.keyUpHandler = this.keyUpHandler.bind(this);
