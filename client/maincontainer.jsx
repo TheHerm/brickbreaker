@@ -6,11 +6,7 @@ import CanvasContainer from './canvas.jsx';
 export class MainContainer extends React.Component{
   constructor(props){
     super(props);
-    // this.handleCountClick = this.handleCountClick.bind(this);
-  }
-
-  handleCountClick(){
-    // Store.dispatch(incrementCount());
+        javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()
   }
 
   render(){

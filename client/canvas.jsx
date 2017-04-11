@@ -32,7 +32,7 @@ class CanvasContainer extends React.Component{
   render(){
     return (
       <div className="canvas-container">
-        <canvas id="myCanvas" width="700" height="500"></canvas>
+        <canvas id="myCanvas" width="1000" height="650"></canvas>
         {
           !this.state.start && <div><button onClick={this.handleStartGame}>Start Game</button></div>
         }

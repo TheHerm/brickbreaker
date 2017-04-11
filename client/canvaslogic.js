@@ -7,8 +7,8 @@ export const FillCanvas = function(){
   this.ctx = this.canvas.getContext('2d');
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 70;
-  this.xMov = 3;
-  this.yMov = -3;
+  this.xMov = 4;
+  this.yMov = -4;
   this.ballRadius = 10;
   this.paddleHeight = 38;
   this.paddleWidth = 90;
@@ -16,12 +16,12 @@ export const FillCanvas = function(){
   this.rightPressed = false;
   this.leftPressed = false;
   this.brickRowCount = 3;
-  this.brickColumnCount = 7;
+  this.brickColumnCount = 12;
   this.brickWidth = 70;
   this.brickHeight = 25;
-  this.brickPadding = 22;
+  this.brickPadding = 10;
   this.brickOffsetTop = 50;
-  this.brickOffsetLeft = 33;
+  this.brickOffsetLeft = 22;
   this.bricks = [];
   this.score = 0;
   this.lives = 3;
@@ -138,7 +138,10 @@ export const FillCanvas = function(){
     /*--- DRAW --- */
   
   this.draw = function() {
+    let drawing = new Image() 
+    drawing.src = "spacebackground.png" 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.drawImage(drawing, -1, 1, 1002, 652);
     this.xPos += this.xMov;
     this.yPos += this.yMov;
     this.drawScore();
@@ -183,12 +186,12 @@ export const FillCanvas = function(){
         this.bricks[c][r].y = brickY;
         this.ctx.beginPath();
         this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = "rgb(229, 20, 0)";
         this.ctx.fill();
         this.ctx.closePath();
         this.ctx.beginPath();
         this.ctx.font = "16px Arial";
-        this.ctx.fillStyle = "#0095DD";
+        this.ctx.fillStyle = "white";
         this.ctx.fillText(this.bricks[c][r].num, brickX+20, brickY+20);
         this.ctx.closePath();
       }
@@ -266,7 +269,6 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
-      console.log("---",edges.bounceSide,"---");
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y01');
