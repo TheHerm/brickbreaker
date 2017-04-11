@@ -1,8 +1,53 @@
+body{
+  background-color: #647687;
+  margin: 0;
+}
+
 .canvas-container{
   text-align: center;
 }
 
 #myCanvas{
   border: 1px solid black;
-  margin: 50px 0px;
+  margin: 20px 0px;
+}
+
+.start-btn{
+  width: 150px;
+  height: 75px;
+  background: #008a00;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+
+.start-btn:hover{
+  box-shadow: 3px 3px 2px black;
+}
+
+.pause-btn{
+  width: 150px;
+  height: 75px;
+  background: #fa6800;
+  border: 1px solid black;
+  border-radius: 2px;
+}
+
+.pause-btn:hover{
+  box-shadow: 3px 3px 2px black;
+}
+
+.spec{
+  display: inline-block !important;
+  margin: 0 2px;
+}
+.spec-container{
+  top: 90vh !important;
+  display: flex !important;
+  margin: 0 10px;
+  padding: 5px;
+  background-color: #6d8764;
+  border: 1px solid black;
+}
+.spec:hover{
+  box-shadow: 3px 3px 2px black;
 }

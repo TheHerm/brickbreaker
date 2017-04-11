@@ -11,7 +11,7 @@ export const FillCanvas = function(){
   this.yMov = -4;
   this.ballRadius = 10;
   this.paddleHeight = 38;
-  this.paddleWidth = 90;
+  this.paddleWidth = 120;
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
   this.rightPressed = false;
   this.leftPressed = false;
@@ -19,9 +19,9 @@ export const FillCanvas = function(){
   this.brickColumnCount = 12;
   this.brickWidth = 70;
   this.brickHeight = 25;
-  this.brickPadding = 10;
+  this.brickPadding = 5;
   this.brickOffsetTop = 50;
-  this.brickOffsetLeft = 22;
+  this.brickOffsetLeft = 47;
   this.bricks = [];
   this.score = 0;
   this.lives = 3;
@@ -139,9 +139,9 @@ export const FillCanvas = function(){
   
   this.draw = function() {
     let drawing = new Image() 
-    drawing.src = "spacebackground.png" 
+    drawing.src = "spacebackgroundtest.png" 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(drawing, -1, 1, 1002, 652);
+    this.ctx.drawImage(drawing, -1, -1, 1002, 652);
     this.xPos += this.xMov;
     this.yPos += this.yMov;
     this.drawScore();
@@ -269,6 +269,7 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
+      console.log("---", edges.bounceSide, "---")
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y01');
@@ -311,7 +312,11 @@ export const FillCanvas = function(){
           break;
         }
         case 'sideWall': {
-          this.xMov = -this.xMov;
+          if(this.xMov > 0){
+            this.bounce('x-1');
+          }else{
+            this.bounce('x01');
+          }
           break;
         }
         case 'topWall': {

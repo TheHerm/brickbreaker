@@ -34,10 +34,10 @@ class CanvasContainer extends React.Component{
       <div className="canvas-container">
         <canvas id="myCanvas" width="1000" height="650"></canvas>
         {
-          !this.state.start && <div><button onClick={this.handleStartGame}>Start Game</button></div>
+          !this.state.start && <div><button className="start-btn" onClick={this.handleStartGame}>Start Game</button></div>
         }
         {
-          !!this.state.start && <div><button onClick={this.handleEndGame}>Pause Game</button></div>
+          !!this.state.start && <div><button className="pause-btn" onClick={this.handleEndGame}>Pause Game</button></div>
         }
       </div>
     )
