@@ -153,7 +153,7 @@ export const FillCanvas = function(){
   this.drawLives = function() {
     this.ctx.beginPath();
     this.ctx.rect(this.canvas.width-70, 0, 70, 20);
-    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillStyle = "#1ba1e2";
     this.ctx.fill();
     this.ctx.closePath();
     this.ctx.beginPath();
@@ -165,7 +165,7 @@ export const FillCanvas = function(){
   this.drawScore = function() {
     this.ctx.beginPath();
     this.ctx.rect(0, 0, 75, 20);
-    this.ctx.fillStyle = "#0095DD";
+    this.ctx.fillStyle = "#1ba1e2";
     this.ctx.fill();
     this.ctx.closePath();
     this.ctx.beginPath();
@@ -186,7 +186,7 @@ export const FillCanvas = function(){
         this.bricks[c][r].y = brickY;
         this.ctx.beginPath();
         this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
-        this.ctx.fillStyle = "rgb(229, 20, 0)";
+        this.ctx.fillStyle = "#e51400";
         this.ctx.fill();
         this.ctx.closePath();
         this.ctx.beginPath();
@@ -200,7 +200,7 @@ export const FillCanvas = function(){
   this.drawBall = function(){
     this.ctx.beginPath();
     this.ctx.arc(this.xPos, this.yPos, this.ballRadius, 0, Math.PI*2);
-    this.ctx.fillStyle = 'rgb(80, 244, 66)';
+    this.ctx.fillStyle = '#60a917';
     this.ctx.fill();
     this.ctx.closePath();
 
@@ -261,7 +261,7 @@ export const FillCanvas = function(){
       this.yMov = -this.yMov;
       this.xMov = -this.xMov;
     }else if(str[0] === 'p'){
-      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
+      this.yPos += (Math.abs(this.yMov) + 3) * str.slice(1);
       this.setBallPixelArray(this.xPos, this.yPos);
     }
   }
@@ -319,7 +319,7 @@ export const FillCanvas = function(){
           break;
         }
         case 'paddle': {
-          this.bounce('p');
+          this.bounce('p-1');
           this.paddleRebound(edges.coord[0]);
           break;
         }
@@ -364,35 +364,35 @@ export const FillCanvas = function(){
       && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
 
     let sides = Object.keys(this.edges);
-    let len, i, j;
+    let len, i, j, x, y;
     for(i=0; i<sides.length; i++){
       len = this.edges[sides[i]].length;
       for(j=0; j<len; j++){
-
-        if(!this.edges[sides[i]][j][0]){
+        x = Math.floor(this.edges[sides[i]][j][0]);
+        y = Math.floor(this.edges[sides[i]][j][1]);
+        if(!x){
           continue;
-        }else if(this.edges[sides[i]][j][0]<=0 || this.edges[sides[i]][j][0]>=this.canvas.width){
+        }else if(x<=0 || x>=this.canvas.width){
           return {
             bounceSide: "sideWall",
             coord: this.edges[sides[i]][j]
           }
-        }else if(this.edges[sides[i]][j][1]<=0){
+        }else if(y<=0){
           return {
             bounceSide: "topWall",
             coord: this.edges[sides[i]][j]
           }
 
-        }else if(this.edges[sides[i]][j][1]>=this.canvas.height){
+        }else if(y>=this.canvas.height){
           return {
             bounceSide: "bottomWall",
             coord: this.edges[sides[i]][j]
           }
-        }else if(
-        this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[0] !== 80
-        && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[1] !== 244
-        && this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data[2] !== 66) {
-          
-          if(this.edges[sides[i]][j][1]>=this.canvas.height-this.paddleHeight){
+        }else if(this.ctx.getImageData(x, y, 1, 1).data[0] !== 96
+        && this.ctx.getImageData(x, y, 1, 1).data[1] !== 169
+        && this.ctx.getImageData(x, y, 1, 1).data[2] !== 23) {
+
+          if(y>=this.canvas.height-this.paddleHeight){
             return {
               bounceSide: "paddle",
               coord: this.edges[sides[i]][j]
@@ -405,6 +405,8 @@ export const FillCanvas = function(){
           }
 
         }
+          // console.log(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data)
+        
       }
     }
     return null;
