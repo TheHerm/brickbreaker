@@ -9,7 +9,7 @@ export const FillCanvas = function(){
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
   this.yMov = -4;
-  this.ballRadius = 10;
+  this.ballRadius = 12;
   this.paddleHeight = 38;
   this.paddleWidth = 120;
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
@@ -27,10 +27,10 @@ export const FillCanvas = function(){
   this.lives = 3;
   this.endGame = false;
   this.edges = {
-    left: new Array(24).fill([]),
-    right: new Array(24).fill([]),
-    bottom: new Array(24).fill([]),
-    top: new Array(24).fill([]),
+    left: new Array(19).fill([]),
+    right: new Array(19).fill([]),
+    bottom: new Array(19).fill([]),
+    top: new Array(19).fill([]),
     topLeft: new Array(3).fill([]),
     topRight: new Array(3).fill([]),
     bottomRight: new Array(3).fill([]),
@@ -80,10 +80,12 @@ export const FillCanvas = function(){
     }
   }
   this.setBallPixelArray = function(x, y){
-    let xTransformLeft = x - (1+this.ballRadius / 2);
-    let xTransformRight = x + (1+this.ballRadius / 2);
-    let yTransformDown = y + (1+this.ballRadius / 2);
-    let yTransformUp = y - (1+this.ballRadius / 2);
+    // x--;
+    // y--;
+    let xTransformLeft = x - (this.ballRadius / 2);
+    let xTransformRight = x + (this.ballRadius / 2);
+    let yTransformDown = y + (this.ballRadius / 2);
+    let yTransformUp = y - (this.ballRadius / 2);
     this.edges.topLeft[0] = [xTransformLeft-1, yTransformUp+1];
     this.edges.topLeft[1] = [xTransformLeft, yTransformUp];
     this.edges.topLeft[2] = [xTransformLeft+1, yTransformUp-1];
@@ -100,28 +102,28 @@ export const FillCanvas = function(){
     this.edges.topRight[1] = [xTransformRight, yTransformUp];
     this.edges.topRight[2] = [xTransformRight+1, yTransformUp+1];
 
-    for(let i = -3; i<4; i++){
-      this.edges.bottom[i+3] = [(x+i), ( y+(this.ballRadius-2) )];
-      this.edges.bottom[i+10] = [(x+i), ( y+(this.ballRadius-3) )];
-      this.edges.bottom[i+17] = [(x+i), ( y+(this.ballRadius-4) )];
+    for(let i = -4; i<5; i++){
+      this.edges.bottom[i+4] = [(x+i), ( y+(this.ballRadius-3) )];
+      // this.edges.bottom[i+10] = [(x+i), ( y+(this.ballRadius-3) )];
+      // this.edges.bottom[i+17] = [(x+i), ( y+(this.ballRadius-4) )];
 
-      this.edges.top[i+3] = [(x+i), ( y-(this.ballRadius-2) )];
-      this.edges.top[i+10] = [(x+i), ( y-(this.ballRadius-3) )];
-      this.edges.top[i+17] = [(x+i), ( y-(this.ballRadius-4) )];
+      this.edges.top[i+4] = [(x+i), ( y-(this.ballRadius-3) )];
+      // this.edges.top[i+10] = [(x+i), ( y-(this.ballRadius-3) )];
+      // this.edges.top[i+17] = [(x+i), ( y-(this.ballRadius-4) )];
 
-      this.edges.right[i+3] = [( x+(this.ballRadius-2) ), (y+i)];
-      this.edges.right[i+10] = [( x+(this.ballRadius-3) ), (y+i)];
-      this.edges.right[i+17] = [( x+(this.ballRadius-4) ), (y+i)];
+      this.edges.right[i+4] = [( x+(this.ballRadius-3) ), (y+i)];
+      // this.edges.right[i+10] = [( x+(this.ballRadius-3) ), (y+i)];
+      // this.edges.right[i+17] = [( x+(this.ballRadius-4) ), (y+i)];
 
-      this.edges.left[i+3] = [( x-(this.ballRadius-2) ), (y+i)];
-      this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
-      this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
+      this.edges.left[i+4] = [( x-(this.ballRadius-3) ), (y+i)];
+      // this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
+      // this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
 
-      if(i>-2 && i<2){
-        this.edges.bottom[i+21] = [(x+i), ( y+(this.ballRadius-2) )];
-        this.edges.top[i+21] = [(x+i), ( y-(this.ballRadius-2) )];
-        this.edges.right[i+21] = [( x+(this.ballRadius-2) ), (y+i)];
-        this.edges.left[i+21] = [( x-(this.ballRadius-2) ), (y+i)];
+      if(i>=-2 && i<=2){
+        this.edges.bottom[i+14] = [(x+i), ( y+(this.ballRadius-2) )];
+        this.edges.top[i+14] = [(x+i), ( y-(this.ballRadius-2) )];
+        this.edges.right[i+14] = [( x+(this.ballRadius-2) ), (y+i)];
+        this.edges.left[i+14] = [( x-(this.ballRadius-2) ), (y+i)];
       }
     }
   }
@@ -139,7 +141,7 @@ export const FillCanvas = function(){
   
   this.draw = function() {
     let drawing = new Image() 
-    drawing.src = "spacebackgroundtest.png" 
+    drawing.src = "spacebackground.jpg" 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.drawImage(drawing, -1, -1, 1002, 652);
     this.xPos += this.xMov;
@@ -199,7 +201,7 @@ export const FillCanvas = function(){
   }
   this.drawBall = function(){
     this.ctx.beginPath();
-    this.ctx.arc(this.xPos, this.yPos, this.ballRadius, 0, Math.PI*2);
+    this.ctx.arc(Math.round(this.xPos), Math.round(this.yPos), this.ballRadius, 0, Math.PI*2);
     this.ctx.fillStyle = '#60a917';
     this.ctx.fill();
     this.ctx.closePath();
@@ -261,7 +263,7 @@ export const FillCanvas = function(){
       this.yMov = -this.yMov;
       this.xMov = -this.xMov;
     }else if(str[0] === 'p'){
-      this.yPos += (Math.abs(this.yMov) + 3) * str.slice(1);
+      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
       this.setBallPixelArray(this.xPos, this.yPos);
     }
   }
@@ -269,7 +271,6 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
-      console.log("---", edges.bounceSide, "---")
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y01');
@@ -346,9 +347,6 @@ export const FillCanvas = function(){
     }
     return;
   }
-  this.yPaddleRebound = function(){
-    this.yMov = -(Math.abs(this.yMov) + .1);
-  }
   this.paddleRebound = function(xCoord){
     let paddlePercent = (xCoord - this.paddleX) / this.paddleWidth;
     let incommingX = this.xMov;
@@ -356,62 +354,63 @@ export const FillCanvas = function(){
     if(paddlePercent >= .50){
       paddlePercent = (2 * paddlePercent) - 1 + Math.pow(paddlePercent, 2);
       this.xMov = incommingX + paddlePercent;
-      this.yPaddleRebound();
+      this.yMov = -(Math.abs(this.yMov) + .1);
     }else{
       paddlePercent = 1 - paddlePercent;
       paddlePercent = (2 * paddlePercent) - 1 + Math.pow(paddlePercent, 2);
       this.xMov = incommingX - paddlePercent;
-      this.yPaddleRebound();
+      this.yMov = -(Math.abs(this.yMov) + .1);
     }
   }
   this.checkCircleEdgesForCollision = function(){
-    if( (this.yPos < this.canvas.height-this.paddleHeight-20 && this.yPos > this.canvas.height/2) 
-      && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
-
+    // if( (this.yPos < this.canvas.height-this.paddleHeight-20 && this.yPos > this.canvas.height/2) 
+    //   && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
     let sides = Object.keys(this.edges);
-    let len, i, j, x, y;
+    let len, i, j, x, y, colorData;
+    // this.ctx.beginPath();
+    // this.ctx.rect(this.xPos, this.yPos, 1, 1);
+    // this.ctx.fillStyle = 'white';
+    // this.ctx.fill();
+    // this.ctx.closePath();
     for(i=0; i<sides.length; i++){
       len = this.edges[sides[i]].length;
       for(j=0; j<len; j++){
-        x = Math.floor(this.edges[sides[i]][j][0]);
-        y = Math.floor(this.edges[sides[i]][j][1]);
+        x = Math.round(this.edges[sides[i]][j][0]);
+        y = Math.round(this.edges[sides[i]][j][1]);
         if(!x){
           continue;
         }else if(x<=0 || x>=this.canvas.width){
           return {
             bounceSide: "sideWall",
-            coord: this.edges[sides[i]][j]
+            coord: [x, y]
           }
         }else if(y<=0){
           return {
             bounceSide: "topWall",
-            coord: this.edges[sides[i]][j]
+            coord: [x, y]
           }
 
         }else if(y>=this.canvas.height){
           return {
             bounceSide: "bottomWall",
-            coord: this.edges[sides[i]][j]
+            coord: [x, y]
           }
-        }else if(this.ctx.getImageData(x, y, 1, 1).data[0] !== 96
-        && this.ctx.getImageData(x, y, 1, 1).data[1] !== 169
-        && this.ctx.getImageData(x, y, 1, 1).data[2] !== 23) {
-
-          if(y>=this.canvas.height-this.paddleHeight){
+        }
+        colorData = this.ctx.getImageData(x, y, 1, 1).data;
+        if(colorData[0] !== 96 && colorData[1] !==  169 && colorData[2] !== 23) {
+          if(y>=this.canvas.height-this.paddleHeight*2){
             return {
               bounceSide: "paddle",
-              coord: this.edges[sides[i]][j]
+              coord: [x, y]
             }
           }else{
             return {
               bounceSide: sides[i] + "",
-              coord: this.edges[sides[i]][j]
+              coord: [x, y]
             }
           }
 
         }
-          // console.log(this.ctx.getImageData(this.edges[sides[i]][j][0], this.edges[sides[i]][j][1], 1, 1).data)
-        
       }
     }
     return null;
