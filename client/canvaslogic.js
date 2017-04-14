@@ -352,9 +352,9 @@ export const FillCanvas = function(){
     // this.ctx.fill();
     // this.ctx.closePath();
     for(this.i=0; this.i<len; this.i++){
-      this.loopLen = this.edges[sides[i]].length;
+      this.loopLen = this.edges[sides[this.i]].length;
       for(this.j=0; this.j<this.loopLen; this.j++){
-        x = Math.round(this.edges[sides[i]][this.j][0]);
+        x = Math.round(this.edges[sides[this.i]][this.j][0]);
         y = Math.round(this.edges[sides[this.i]][this.j][1]);
         if(!x){
           continue;
@@ -398,23 +398,23 @@ export const FillCanvas = function(){
   this.moveCircleEdges = function(x, y){
     this.loopLen = this.edges.top.length
     for(this.i=0; this.i<this.loopLen; this.i++){
-      this.edges.top[i][0] += this.xMov;
-      this.edges.right[i][0] += this.xMov;
-      this.edges.left[i][0] += this.xMov;
-      this.edges.bottom[i][0] += this.xMov;
-      this.edges.top[i][1] += this.yMov;
-      this.edges.right[i][1] += this.yMov;
-      this.edges.left[i][1] += this.yMov;
-      this.edges.bottom[i][1] += this.yMov;
+      this.edges.top[this.i][0] += this.xMov;
+      this.edges.right[this.i][0] += this.xMov;
+      this.edges.left[this.i][0] += this.xMov;
+      this.edges.bottom[this.i][0] += this.xMov;
+      this.edges.top[this.i][1] += this.yMov;
+      this.edges.right[this.i][1] += this.yMov;
+      this.edges.left[this.i][1] += this.yMov;
+      this.edges.bottom[this.i][1] += this.yMov;
       if(this.i >= this.edges.topRight.length) continue;
-      this.edges.topRight[i][1] += this.yMov;
-      this.edges.topLeft[i][1] += this.yMov;
-      this.edges.bottomRight[i][1] += this.yMov;
-      this.edges.bottomLeft[i][1] += this.yMov;
-      this.edges.topRight[i][0] += this.xMov;
-      this.edges.topLeft[i][0] += this.xMov;
-      this.edges.bottomLeft[i][0] += this.xMov;
-      this.edges.bottomRight[i][0] += this.xMov;
+      this.edges.topRight[this.i][1] += this.yMov;
+      this.edges.topLeft[this.i][1] += this.yMov;
+      this.edges.bottomRight[this.i][1] += this.yMov;
+      this.edges.bottomLeft[this.i][1] += this.yMov;
+      this.edges.topRight[this.i][0] += this.xMov;
+      this.edges.topLeft[this.i][0] += this.xMov;
+      this.edges.bottomLeft[this.i][0] += this.xMov;
+      this.edges.bottomRight[this.i][0] += this.xMov;
     }
     
   }
