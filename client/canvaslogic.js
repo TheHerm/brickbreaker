@@ -13,6 +13,7 @@ export const FillCanvas = function(){
   this.i = 0;
   this.j = 0;
   this.loopLen = 0;
+  this.brick = null;
   this.ballRadius = 12;
   this.paddleHeight = 38;
   this.paddleWidth = 120;
@@ -20,13 +21,6 @@ export const FillCanvas = function(){
   this.rightPressed = false;
   this.leftPressed = false;
   this.brickCount = 30;
-  // this.brickRowCount = 3;
-  // this.brickColumnCount = 12;
-  // this.brickWidth = 70;
-  // this.brickHeight = 25;
-  // this.brickPadding = 5;
-  // this.brickOffsetTop = 50;
-  // this.brickOffsetLeft = 47;
   this.bricks = new Array(this.brickCount).fill({dead: true});
   this.score = 0;
   this.lives = 3;
@@ -63,7 +57,7 @@ export const FillCanvas = function(){
     this.endGame = true;
   }
   this.checkEnd = function(){
-    if(this.score == this.brickRowCount*this.brickColumnCount) {
+    if(this.score == this.bricks.length) {
       this.endGame = true;
       alert("YOU WIN, CONGRATULATIONS!");
       document.location.reload();
@@ -132,13 +126,10 @@ export const FillCanvas = function(){
     }
   }
   this.animate = function(){
-    if(this.endGame){
-      return;
-    }else if(!this.endGame) {
-      this.draw();
-      this.collisionDetection();
-      requestAnimationFrame(this.animate);
-    }
+    if(this.endGame) return;
+    this.draw();
+    this.collisionDetection();
+    requestAnimationFrame(this.animate);
   }
 
     /*--- DRAW --- */
@@ -226,16 +217,13 @@ export const FillCanvas = function(){
   
   
   this.removeBrick = function(coord){
-    let brick;
-    for(let c=0; c<this.brickColumnCount; c++) {
-      for(let r=0; r<this.brickRowCount; r++) {
-        brick = this.bricks[c][r];
-        if(brick.status && coord[0] >= brick.x && coord[0] <= brick.x+this.brickWidth && coord[1] >= brick.y && coord[1] <= brick.y+this.brickHeight){
-          brick.status = 0;
-          this.score++;
-          this.checkEnd();
-          return;
-        }
+    this.loopLen = this.bricks.length
+    for(this.i = 0; this.i<this.loopLen; this.i++) {
+      if(this.bricks[this.i].dead) continue;
+      if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
+        this.score++;
+        this.checkEnd();
+        return;
       }
     }
   }
@@ -266,7 +254,6 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
-      console.log(edges.bounceSide)
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y');

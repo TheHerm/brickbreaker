@@ -18,6 +18,13 @@ export  const Brick = function(id){
 
 /* -------------- FUNCTIONS ----------------*/
 
+      /* --------- initialization ---------*/
+
+  this.setInitialPos = function(width, height){
+    this.x = Math.round((width - this.width) * Math.random());
+    this.y = Math.round((height - this.height) * Math.random());
+  }
+
       /* --------- frame change ---------*/
 
   this.stepForward = function(){
@@ -40,13 +47,16 @@ export  const Brick = function(id){
     ctx.closePath();
   }
 
-      /* --------- initialization ---------*/
-
-  this.setInitialPos = function(width, height){
-    this.x = (width - this.width) * Math.random();
-    this.y = (height - this.height) * Math.random();
+      /* --------- util functions ---------*/
+  
+  this.checkCollision = function(x, y){
+    if(x>=this.x && x<=(this.x+this.width) && y>=this.y && y<=(this.y+this.height)){
+      this.removeBrick();
+      return true;
+    }
+    return false;
   }
-
+  
       /* --------- state change ---------*/
 
   this.removeBrick = function(){
