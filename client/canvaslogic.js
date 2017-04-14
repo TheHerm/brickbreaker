@@ -82,8 +82,6 @@ export const FillCanvas = function(){
     }
   }
   this.setBallPixelArray = function(x, y){
-    // x--;
-    // y--;
     let xTransformLeft = x - (this.ballRadius / 2 - 1);
     let xTransformRight = x + (this.ballRadius / 2 - 1);
     let yTransformDown = y + (this.ballRadius / 2 - 1);
