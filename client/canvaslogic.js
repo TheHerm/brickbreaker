@@ -26,6 +26,7 @@ export const FillCanvas = function(){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
+  this.actionHeight = 0;
   this.edges = {
     left: new Array(19).fill([]),
     right: new Array(19).fill([]),
@@ -52,6 +53,7 @@ export const FillCanvas = function(){
       // document.addEventListener("keydown", this.keyDownHandler, false);
       // document.addEventListener("keyup", this.keyUpHandler, false);
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
+      this.actionHeight = this.brickOffsetTop + (this.brickRowCount * (this.brickHeight + this.brickPadding)) + (3*this.ballRadius);
       this.setBallPixelArray(this.xPos, this.yPos);
       this.animate();
     }else {
@@ -82,10 +84,10 @@ export const FillCanvas = function(){
   this.setBallPixelArray = function(x, y){
     // x--;
     // y--;
-    let xTransformLeft = x - (this.ballRadius / 2);
-    let xTransformRight = x + (this.ballRadius / 2);
-    let yTransformDown = y + (this.ballRadius / 2);
-    let yTransformUp = y - (this.ballRadius / 2);
+    let xTransformLeft = x - (this.ballRadius / 2 - 1);
+    let xTransformRight = x + (this.ballRadius / 2 - 1);
+    let yTransformDown = y + (this.ballRadius / 2 - 1);
+    let yTransformUp = y - (this.ballRadius / 2 - 1);
     this.edges.topLeft[0] = [xTransformLeft-1, yTransformUp+1];
     this.edges.topLeft[1] = [xTransformLeft, yTransformUp];
     this.edges.topLeft[2] = [xTransformLeft+1, yTransformUp-1];
@@ -103,27 +105,27 @@ export const FillCanvas = function(){
     this.edges.topRight[2] = [xTransformRight+1, yTransformUp+1];
 
     for(let i = -4; i<5; i++){
-      this.edges.bottom[i+4] = [(x+i), ( y+(this.ballRadius-3) )];
+      this.edges.bottom[i+4] = [(x+i), ( y+(this.ballRadius-4) )];
       // this.edges.bottom[i+10] = [(x+i), ( y+(this.ballRadius-3) )];
       // this.edges.bottom[i+17] = [(x+i), ( y+(this.ballRadius-4) )];
 
-      this.edges.top[i+4] = [(x+i), ( y-(this.ballRadius-3) )];
+      this.edges.top[i+4] = [(x+i), ( y-(this.ballRadius-4) )];
       // this.edges.top[i+10] = [(x+i), ( y-(this.ballRadius-3) )];
       // this.edges.top[i+17] = [(x+i), ( y-(this.ballRadius-4) )];
 
-      this.edges.right[i+4] = [( x+(this.ballRadius-3) ), (y+i)];
+      this.edges.right[i+4] = [( x+(this.ballRadius-4) ), (y+i)];
       // this.edges.right[i+10] = [( x+(this.ballRadius-3) ), (y+i)];
       // this.edges.right[i+17] = [( x+(this.ballRadius-4) ), (y+i)];
 
-      this.edges.left[i+4] = [( x-(this.ballRadius-3) ), (y+i)];
+      this.edges.left[i+4] = [( x-(this.ballRadius-4) ), (y+i)];
       // this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
       // this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
 
       if(i>=-2 && i<=2){
-        this.edges.bottom[i+14] = [(x+i), ( y+(this.ballRadius-2) )];
-        this.edges.top[i+14] = [(x+i), ( y-(this.ballRadius-2) )];
-        this.edges.right[i+14] = [( x+(this.ballRadius-2) ), (y+i)];
-        this.edges.left[i+14] = [( x-(this.ballRadius-2) ), (y+i)];
+        this.edges.bottom[i+14] = [(x+i), ( y+(this.ballRadius-3) )];
+        this.edges.top[i+14] = [(x+i), ( y-(this.ballRadius-3) )];
+        this.edges.right[i+14] = [( x+(this.ballRadius-3) ), (y+i)];
+        this.edges.left[i+14] = [( x-(this.ballRadius-3) ), (y+i)];
       }
     }
   }
@@ -229,7 +231,7 @@ export const FillCanvas = function(){
   }
   this.drawPaddle = function() {
     let drawing = new Image() 
-    drawing.src = "Spaceship.png" 
+    drawing.src = "Spaceship2.png" 
     this.ctx.drawImage(drawing, this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
   
@@ -252,43 +254,50 @@ export const FillCanvas = function(){
   }
   this.bounce = function(str){
     if(str[0] === 'x'){
-      this.xPos += (Math.abs(this.xMov) + 2) * str.slice(1);
       this.xMov = -this.xMov;
-      this.setBallPixelArray(this.xPos, this.yPos);
+      this.xPos += this.xMov;
+      this.yPos += this.yMov;
+      // this.xPos += (Math.abs(this.xMov) + 2) * str.slice(1);
     }else if(str[0] === 'y'){
-      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
       this.yMov = -this.yMov;
-      this.setBallPixelArray(this.xPos, this.yPos);
+      this.yPos += this.yMov;
+      this.xPos += this.xMov;      
+      // this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
     }else if(str[0] === 'z'){
       this.yMov = -this.yMov;
       this.xMov = -this.xMov;
+      this.xPos += this.xMov;      
+      this.yPos += this.yMov;
     }else if(str[0] === 'p'){
-      this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
-      this.setBallPixelArray(this.xPos, this.yPos);
+      this.xPos += this.xMov;      
+      this.yPos += this.yMov;
+      // this.yPos += (Math.abs(this.yMov) + 2) * str.slice(1);
     }
+    this.setBallPixelArray(this.xPos, this.yPos);
   }
   this.collisionDetection = function() {
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
+      console.log(edges.bounceSide)
       switch(edges.bounceSide){
         case 'top': {
-          this.bounce('y01');
+          this.bounce('y');
           this.removeBrick(edges.coord);
           break;
         }
         case 'bottom': {
-          this.bounce('y-1');
+          this.bounce('y');
           this.removeBrick(edges.coord);
           break;
         }
         case 'left': {
-          this.bounce('x01');
+          this.bounce('x');
           this.removeBrick(edges.coord);
           break;
         }
         case 'right': {
-          this.bounce('x-1');
+          this.bounce('x');
           this.removeBrick(edges.coord);
           break;
         }
@@ -313,20 +322,16 @@ export const FillCanvas = function(){
           break;
         }
         case 'sideWall': {
-          if(this.xMov > 0){
-            this.bounce('x-1');
-          }else{
-            this.bounce('x01');
-          }
+          this.bounce('x');
           break;
         }
         case 'topWall': {
-          this.bounce('y01');
+          this.bounce('y');
           break;
         }
         case 'paddle': {
-          this.bounce('p-1');
           this.paddleRebound(edges.coord[0]);
+          this.bounce('p');
           break;
         }
         case 'bottomWall': {
@@ -363,7 +368,7 @@ export const FillCanvas = function(){
     }
   }
   this.checkCircleEdgesForCollision = function(){
-    // if( (this.yPos < this.canvas.height-this.paddleHeight-20 && this.yPos > this.canvas.height/2) 
+    // if( (this.yPos < this.canvas.height - this.paddleHeight*2 && this.yPos > this.actionHeight) 
     //   && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
     let sides = Object.keys(this.edges);
     let len, i, j, x, y, colorData;
@@ -397,7 +402,8 @@ export const FillCanvas = function(){
           }
         }
         colorData = this.ctx.getImageData(x, y, 1, 1).data;
-        if(colorData[0] !== 96 && colorData[1] !==  169 && colorData[2] !== 23) {
+        if(typeof colorData[0] == 'number' && colorData[0] !== 96 && colorData[1] !==  169 && colorData[2] !== 23) {
+          colorData = [];
           if(y>=this.canvas.height-this.paddleHeight*2){
             return {
               bounceSide: "paddle",
