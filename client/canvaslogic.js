@@ -1,3 +1,4 @@
+import {Brick} from './bricks.jsx';
 
 export const FillCanvas = function(){
 
@@ -9,24 +10,27 @@ export const FillCanvas = function(){
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
   this.yMov = -4;
+  this.i = 0;
+  this.j = 0;
+  this.loopLen = 0;
   this.ballRadius = 12;
   this.paddleHeight = 38;
   this.paddleWidth = 120;
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
   this.rightPressed = false;
   this.leftPressed = false;
-  this.brickRowCount = 3;
-  this.brickColumnCount = 12;
-  this.brickWidth = 70;
-  this.brickHeight = 25;
-  this.brickPadding = 5;
-  this.brickOffsetTop = 50;
-  this.brickOffsetLeft = 47;
-  this.bricks = [];
+  this.brickCount = 30;
+  // this.brickRowCount = 3;
+  // this.brickColumnCount = 12;
+  // this.brickWidth = 70;
+  // this.brickHeight = 25;
+  // this.brickPadding = 5;
+  // this.brickOffsetTop = 50;
+  // this.brickOffsetLeft = 47;
+  this.bricks = new Array(this.brickCount).fill({dead: true});
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-  this.actionHeight = 0;
   this.edges = {
     left: new Array(19).fill([]),
     right: new Array(19).fill([]),
@@ -44,17 +48,11 @@ export const FillCanvas = function(){
 
   this.startGame = function(){
     if(this.endGame == false){
-      for(let c=0; c<this.brickColumnCount; c++) {
-        this.bricks[c] = [];
-        for(let r=0; r<this.brickRowCount; r++) {
-          this.bricks[c][r] = { x: 0, y: 0, status: 1 };
-        }
-      }
       // document.addEventListener("keydown", this.keyDownHandler, false);
       // document.addEventListener("keyup", this.keyUpHandler, false);
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
-      this.actionHeight = this.brickOffsetTop + (this.brickRowCount * (this.brickHeight + this.brickPadding)) + (3*this.ballRadius);
       this.setBallPixelArray(this.xPos, this.yPos);
+      this.createBricks();
       this.animate();
     }else {
       this.endGame = false;
@@ -127,6 +125,12 @@ export const FillCanvas = function(){
       }
     }
   }
+  this.createBricks = function(){
+    for(this.i = 1; this.i<=this.brickCount; this.i++){
+      this.bricks[this.i] = new Brick(this.i);
+      this.bricks[this.i].setInitialPos(this.canvas.width, this.canvas.height / 2);
+    }
+  }
   this.animate = function(){
     if(this.endGame){
       return;
@@ -177,26 +181,11 @@ export const FillCanvas = function(){
     this.ctx.closePath();
   }
   this.drawBricks = function() {
-    let count = 0;
-    for(let c=0; c<this.brickColumnCount; c++) {
-      for(let r=0; r<this.brickRowCount; r++) {
-        this.bricks[c][r].num = ++count;
-        if(!this.bricks[c][r].status) continue;
-        let brickX = (c*(this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
-        let brickY = (r*(this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
-        this.bricks[c][r].x = brickX;
-        this.bricks[c][r].y = brickY;
-        this.ctx.beginPath();
-        this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
-        this.ctx.fillStyle = "#e51400";
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.ctx.beginPath();
-        this.ctx.font = "16px Arial";
-        this.ctx.fillStyle = "white";
-        this.ctx.fillText(this.bricks[c][r].num, brickX+20, brickY+20);
-        this.ctx.closePath();
-      }
+    this.loopLen = this.bricks.length;
+    for(this.i = 0; this.i<this.loopLen; this.i++) {
+      if(this.bricks[this.i].dead) continue;
+      this.bricks[this.i].stepForward();
+      this.bricks[this.i].drawBrick(this.ctx);
     }
   }
   this.drawBall = function(){
