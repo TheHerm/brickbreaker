@@ -94,28 +94,28 @@ export const FillCanvas = function(){
     this.edges.topRight[1] = [xTransformRight, yTransformUp];
     this.edges.topRight[2] = [xTransformRight+1, yTransformUp+1];
 
-    for(let i = -4; i<5; i++){
-      this.edges.bottom[i+4] = [(x+i), ( y+(this.ballRadius-4) )];
+    for(this.i = -4; this.i<5; this.i++){
+      this.edges.bottom[this.i+4] = [(x+this.i), ( y+(this.ballRadius-4) )];
       // this.edges.bottom[i+10] = [(x+i), ( y+(this.ballRadius-3) )];
       // this.edges.bottom[i+17] = [(x+i), ( y+(this.ballRadius-4) )];
 
-      this.edges.top[i+4] = [(x+i), ( y-(this.ballRadius-4) )];
+      this.edges.top[this.i+4] = [(x+this.i), ( y-(this.ballRadius-4) )];
       // this.edges.top[i+10] = [(x+i), ( y-(this.ballRadius-3) )];
       // this.edges.top[i+17] = [(x+i), ( y-(this.ballRadius-4) )];
 
-      this.edges.right[i+4] = [( x+(this.ballRadius-4) ), (y+i)];
+      this.edges.right[this.i+4] = [( x+(this.ballRadius-4) ), (y+this.i)];
       // this.edges.right[i+10] = [( x+(this.ballRadius-3) ), (y+i)];
       // this.edges.right[i+17] = [( x+(this.ballRadius-4) ), (y+i)];
 
-      this.edges.left[i+4] = [( x-(this.ballRadius-4) ), (y+i)];
+      this.edges.left[this.i+4] = [( x-(this.ballRadius-4) ), (y+this.i)];
       // this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
       // this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
 
-      if(i>=-2 && i<=2){
-        this.edges.bottom[i+14] = [(x+i), ( y+(this.ballRadius-3) )];
-        this.edges.top[i+14] = [(x+i), ( y-(this.ballRadius-3) )];
-        this.edges.right[i+14] = [( x+(this.ballRadius-3) ), (y+i)];
-        this.edges.left[i+14] = [( x-(this.ballRadius-3) ), (y+i)];
+      if(this.i>=-2 && this.i<=2){
+        this.edges.bottom[this.i+14] = [(x+this.i), ( y+(this.ballRadius-3) )];
+        this.edges.top[this.i+14] = [(x+this.i), ( y-(this.ballRadius-3) )];
+        this.edges.right[this.i+14] = [( x+(this.ballRadius-3) ), (y+this.i)];
+        this.edges.left[this.i+14] = [( x-(this.ballRadius-3) ), (y+this.i)];
       }
     }
   }
@@ -345,17 +345,17 @@ export const FillCanvas = function(){
     // if( (this.yPos < this.canvas.height - this.paddleHeight*2 && this.yPos > this.actionHeight) 
     //   && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
     let sides = Object.keys(this.edges);
-    let len, i, j, x, y, colorData;
+    let x, y, colorData, len = sides.length;
     // this.ctx.beginPath();
     // this.ctx.rect(this.xPos, this.yPos, 1, 1);
     // this.ctx.fillStyle = 'white';
     // this.ctx.fill();
     // this.ctx.closePath();
-    for(i=0; i<sides.length; i++){
-      len = this.edges[sides[i]].length;
-      for(j=0; j<len; j++){
-        x = Math.round(this.edges[sides[i]][j][0]);
-        y = Math.round(this.edges[sides[i]][j][1]);
+    for(this.i=0; this.i<len; this.i++){
+      this.loopLen = this.edges[sides[i]].length;
+      for(this.j=0; this.j<this.loopLen; this.j++){
+        x = Math.round(this.edges[sides[i]][this.j][0]);
+        y = Math.round(this.edges[sides[this.i]][this.j][1]);
         if(!x){
           continue;
         }else if(x<=0 || x>=this.canvas.width){
@@ -385,7 +385,7 @@ export const FillCanvas = function(){
             }
           }else{
             return {
-              bounceSide: sides[i] + "",
+              bounceSide: sides[this.i] + "",
               coord: [x, y]
             }
           }
@@ -396,7 +396,8 @@ export const FillCanvas = function(){
     return null;
   }
   this.moveCircleEdges = function(x, y){
-    for(let i=0; i<this.edges.top.length; i++){
+    this.loopLen = this.edges.top.length
+    for(this.i=0; this.i<this.loopLen; this.i++){
       this.edges.top[i][0] += this.xMov;
       this.edges.right[i][0] += this.xMov;
       this.edges.left[i][0] += this.xMov;
@@ -405,7 +406,7 @@ export const FillCanvas = function(){
       this.edges.right[i][1] += this.yMov;
       this.edges.left[i][1] += this.yMov;
       this.edges.bottom[i][1] += this.yMov;
-      if(i >= this.edges.topRight.length) continue;
+      if(this.i >= this.edges.topRight.length) continue;
       this.edges.topRight[i][1] += this.yMov;
       this.edges.topLeft[i][1] += this.yMov;
       this.edges.bottomRight[i][1] += this.yMov;
