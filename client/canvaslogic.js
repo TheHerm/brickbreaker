@@ -120,7 +120,7 @@ export const FillCanvas = function(){
       // }
   }
   this.createBricks = function(){
-    for(this.i = 0; this.i<=this.brickCount; this.i++){
+    for(this.i = 0; this.i<this.brickCount; this.i++){
       this.bricks[this.i] = new Brick(this.i+1);
       this.bricks[this.i].setInitialPos(this.canvas.width, this.canvas.height / 2);
     }
@@ -175,7 +175,7 @@ export const FillCanvas = function(){
     this.loopLen = this.bricks.length;
     for(this.i = 0; this.i<this.loopLen; this.i++) {
       if(this.bricks[this.i].dead) continue;
-      this.bricks[this.i].stepForward();
+      this.bricks[this.i].stepForward(this.xPos, this.yPos);
       this.bricks[this.i].drawBrick(this.ctx);
     }
   }
