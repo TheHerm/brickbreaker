@@ -1,3 +1,4 @@
+import {Brick} from './bricks.jsx';
 
 export const FillCanvas = function(){
 
@@ -9,33 +10,30 @@ export const FillCanvas = function(){
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
   this.yMov = -4;
+  this.i = 0;
+  this.j = 0;
+  this.loopLen = 0;
+  this.brick = null;
   this.ballRadius = 12;
   this.paddleHeight = 38;
   this.paddleWidth = 120;
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
   this.rightPressed = false;
   this.leftPressed = false;
-  this.brickRowCount = 3;
-  this.brickColumnCount = 12;
-  this.brickWidth = 70;
-  this.brickHeight = 25;
-  this.brickPadding = 5;
-  this.brickOffsetTop = 50;
-  this.brickOffsetLeft = 47;
-  this.bricks = [];
+  this.brickCount = 20;
+  this.bricks = new Array(this.brickCount).fill({dead: true});
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-  this.actionHeight = 0;
   this.edges = {
-    left: new Array(19).fill([]),
-    right: new Array(19).fill([]),
-    bottom: new Array(19).fill([]),
-    top: new Array(19).fill([]),
-    topLeft: new Array(3).fill([]),
-    topRight: new Array(3).fill([]),
-    bottomRight: new Array(3).fill([]),
-    bottomLeft: new Array(3).fill([])
+    left: new Array(1).fill([]),
+    right: new Array(1).fill([]),
+    bottom: new Array(1).fill([]),
+    top: new Array(1).fill([]),
+    topLeft: new Array(1).fill([]),
+    topRight: new Array(1).fill([]),
+    bottomRight: new Array(1).fill([]),
+    bottomLeft: new Array(1).fill([])
   };
 
 /*---------------- FUNCTIONS ----------------- */
@@ -44,17 +42,11 @@ export const FillCanvas = function(){
 
   this.startGame = function(){
     if(this.endGame == false){
-      for(let c=0; c<this.brickColumnCount; c++) {
-        this.bricks[c] = [];
-        for(let r=0; r<this.brickRowCount; r++) {
-          this.bricks[c][r] = { x: 0, y: 0, status: 1 };
-        }
-      }
       // document.addEventListener("keydown", this.keyDownHandler, false);
       // document.addEventListener("keyup", this.keyUpHandler, false);
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
-      this.actionHeight = this.brickOffsetTop + (this.brickRowCount * (this.brickHeight + this.brickPadding)) + (3*this.ballRadius);
       this.setBallPixelArray(this.xPos, this.yPos);
+      this.createBricks();
       this.animate();
     }else {
       this.endGame = false;
@@ -65,7 +57,7 @@ export const FillCanvas = function(){
     this.endGame = true;
   }
   this.checkEnd = function(){
-    if(this.score == this.brickRowCount*this.brickColumnCount) {
+    if(this.score == this.bricks.length) {
       this.endGame = true;
       alert("YOU WIN, CONGRATULATIONS!");
       document.location.reload();
@@ -86,55 +78,58 @@ export const FillCanvas = function(){
     let xTransformRight = x + (this.ballRadius / 2 - 1);
     let yTransformDown = y + (this.ballRadius / 2 - 1);
     let yTransformUp = y - (this.ballRadius / 2 - 1);
-    this.edges.topLeft[0] = [xTransformLeft-1, yTransformUp+1];
-    this.edges.topLeft[1] = [xTransformLeft, yTransformUp];
-    this.edges.topLeft[2] = [xTransformLeft+1, yTransformUp-1];
 
-    this.edges.bottomLeft[0] = [xTransformLeft-1, yTransformDown-1];
-    this.edges.bottomLeft[1] = [xTransformLeft, yTransformDown];
-    this.edges.bottomLeft[2] = [xTransformLeft+1, yTransformDown+1];
+    // this.edges.topLeft[0] = [xTransformLeft-1, yTransformUp+1];
+    this.edges.topLeft[0] = [xTransformLeft, yTransformUp];
+    // this.edges.topLeft[2] = [xTransformLeft+1, yTransformUp-1];
 
-    this.edges.bottomRight[0] = [xTransformRight+1, yTransformDown-1];
-    this.edges.bottomRight[1] = [xTransformRight, yTransformDown];
-    this.edges.bottomRight[2] = [xTransformRight-1, yTransformDown+1];
+    // this.edges.bottomLeft[0] = [xTransformLeft-1, yTransformDown-1];
+    this.edges.bottomLeft[0] = [xTransformLeft, yTransformDown];
+    // this.edges.bottomLeft[2] = [xTransformLeft+1, yTransformDown+1];
 
-    this.edges.topRight[0] = [xTransformRight-1, yTransformUp-1];
-    this.edges.topRight[1] = [xTransformRight, yTransformUp];
-    this.edges.topRight[2] = [xTransformRight+1, yTransformUp+1];
+    // this.edges.bottomRight[0] = [xTransformRight+1, yTransformDown-1];
+    this.edges.bottomRight[0] = [xTransformRight, yTransformDown];
+    // this.edges.bottomRight[2] = [xTransformRight-1, yTransformDown+1];
 
-    for(let i = -4; i<5; i++){
-      this.edges.bottom[i+4] = [(x+i), ( y+(this.ballRadius-4) )];
+    // this.edges.topRight[0] = [xTransformRight-1, yTransformUp-1];
+    this.edges.topRight[0] = [xTransformRight, yTransformUp];
+    // this.edges.topRight[2] = [xTransformRight+1, yTransformUp+1];
+
+    // for(this.i = -4; this.i<5; this.i++){
+      // this.edges.bottom[this.i+4] = [(x+this.i), ( y+(this.ballRadius-4) )];
       // this.edges.bottom[i+10] = [(x+i), ( y+(this.ballRadius-3) )];
       // this.edges.bottom[i+17] = [(x+i), ( y+(this.ballRadius-4) )];
 
-      this.edges.top[i+4] = [(x+i), ( y-(this.ballRadius-4) )];
+      // this.edges.top[this.i+4] = [(x+this.i), ( y-(this.ballRadius-4) )];
       // this.edges.top[i+10] = [(x+i), ( y-(this.ballRadius-3) )];
       // this.edges.top[i+17] = [(x+i), ( y-(this.ballRadius-4) )];
 
-      this.edges.right[i+4] = [( x+(this.ballRadius-4) ), (y+i)];
+      // this.edges.right[this.i+4] = [( x+(this.ballRadius-4) ), (y+this.i)];
       // this.edges.right[i+10] = [( x+(this.ballRadius-3) ), (y+i)];
       // this.edges.right[i+17] = [( x+(this.ballRadius-4) ), (y+i)];
 
-      this.edges.left[i+4] = [( x-(this.ballRadius-4) ), (y+i)];
+      // this.edges.left[this.i+4] = [( x-(this.ballRadius-4) ), (y+this.i)];
       // this.edges.left[i+10] = [( x-(this.ballRadius-3) ), (y+i)];
       // this.edges.left[i+17] = [( x-(this.ballRadius-4) ), (y+i)];
 
-      if(i>=-2 && i<=2){
-        this.edges.bottom[i+14] = [(x+i), ( y+(this.ballRadius-3) )];
-        this.edges.top[i+14] = [(x+i), ( y-(this.ballRadius-3) )];
-        this.edges.right[i+14] = [( x+(this.ballRadius-3) ), (y+i)];
-        this.edges.left[i+14] = [( x-(this.ballRadius-3) ), (y+i)];
-      }
+      // if(this.i>=-2 && this.i<=2){
+    this.edges.bottom[0] = [(x), ( y+(this.ballRadius-3) )];
+    this.edges.top[0] = [(x), ( y-(this.ballRadius-3) )];
+    this.edges.right[0] = [( x+(this.ballRadius-3) ), (y)];
+    this.edges.left[0] = [( x-(this.ballRadius-3) ), (y)];
+      // }
+  }
+  this.createBricks = function(){
+    for(this.i = 0; this.i<this.brickCount; this.i++){
+      this.bricks[this.i] = new Brick(this.i+1);
+      this.bricks[this.i].setInitialPos(this.canvas.width, this.canvas.height / 2);
     }
   }
   this.animate = function(){
-    if(this.endGame){
-      return;
-    }else if(!this.endGame) {
-      this.draw();
-      this.collisionDetection();
-      requestAnimationFrame(this.animate);
-    }
+    if(this.endGame) return;
+    this.draw();
+    this.collisionDetection();
+    requestAnimationFrame(this.animate);
   }
 
     /*--- DRAW --- */
@@ -177,26 +172,11 @@ export const FillCanvas = function(){
     this.ctx.closePath();
   }
   this.drawBricks = function() {
-    let count = 0;
-    for(let c=0; c<this.brickColumnCount; c++) {
-      for(let r=0; r<this.brickRowCount; r++) {
-        this.bricks[c][r].num = ++count;
-        if(!this.bricks[c][r].status) continue;
-        let brickX = (c*(this.brickWidth + this.brickPadding)) + this.brickOffsetLeft;
-        let brickY = (r*(this.brickHeight + this.brickPadding)) + this.brickOffsetTop;
-        this.bricks[c][r].x = brickX;
-        this.bricks[c][r].y = brickY;
-        this.ctx.beginPath();
-        this.ctx.rect(this.bricks[c][r].x, this.bricks[c][r].y, this.brickWidth, this.brickHeight);
-        this.ctx.fillStyle = "#e51400";
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.ctx.beginPath();
-        this.ctx.font = "16px Arial";
-        this.ctx.fillStyle = "white";
-        this.ctx.fillText(this.bricks[c][r].num, brickX+20, brickY+20);
-        this.ctx.closePath();
-      }
+    this.loopLen = this.bricks.length;
+    for(this.i = 0; this.i<this.loopLen; this.i++) {
+      if(this.bricks[this.i].dead) continue;
+      this.bricks[this.i].stepForward(this.xPos, this.yPos);
+      this.bricks[this.i].drawBrick(this.ctx);
     }
   }
   this.drawBall = function(){
@@ -237,16 +217,13 @@ export const FillCanvas = function(){
   
   
   this.removeBrick = function(coord){
-    let brick;
-    for(let c=0; c<this.brickColumnCount; c++) {
-      for(let r=0; r<this.brickRowCount; r++) {
-        brick = this.bricks[c][r];
-        if(brick.status && coord[0] >= brick.x && coord[0] <= brick.x+this.brickWidth && coord[1] >= brick.y && coord[1] <= brick.y+this.brickHeight){
-          brick.status = 0;
-          this.score++;
-          this.checkEnd();
-          return;
-        }
+    this.loopLen = this.bricks.length
+    for(this.i = 0; this.i<this.loopLen; this.i++) {
+      if(this.bricks[this.i].dead) continue;
+      if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
+        this.score++;
+        this.checkEnd();
+        return;
       }
     }
   }
@@ -277,7 +254,6 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
-      console.log(edges.bounceSide)
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y');
@@ -369,17 +345,17 @@ export const FillCanvas = function(){
     // if( (this.yPos < this.canvas.height - this.paddleHeight*2 && this.yPos > this.actionHeight) 
     //   && (this.xPos > 30 && this.xPos < this.canvas.width-30) )   return;
     let sides = Object.keys(this.edges);
-    let len, i, j, x, y, colorData;
+    let x, y, colorData, len = sides.length;
     // this.ctx.beginPath();
     // this.ctx.rect(this.xPos, this.yPos, 1, 1);
     // this.ctx.fillStyle = 'white';
     // this.ctx.fill();
     // this.ctx.closePath();
-    for(i=0; i<sides.length; i++){
-      len = this.edges[sides[i]].length;
-      for(j=0; j<len; j++){
-        x = Math.round(this.edges[sides[i]][j][0]);
-        y = Math.round(this.edges[sides[i]][j][1]);
+    for(this.i=0; this.i<len; this.i++){
+      this.loopLen = this.edges[sides[this.i]].length;
+      for(this.j=0; this.j<this.loopLen; this.j++){
+        x = Math.round(this.edges[sides[this.i]][this.j][0]);
+        y = Math.round(this.edges[sides[this.i]][this.j][1]);
         if(!x){
           continue;
         }else if(x<=0 || x>=this.canvas.width){
@@ -409,7 +385,7 @@ export const FillCanvas = function(){
             }
           }else{
             return {
-              bounceSide: sides[i] + "",
+              bounceSide: sides[this.i] + "",
               coord: [x, y]
             }
           }
@@ -420,24 +396,25 @@ export const FillCanvas = function(){
     return null;
   }
   this.moveCircleEdges = function(x, y){
-    for(let i=0; i<this.edges.top.length; i++){
-      this.edges.top[i][0] += this.xMov;
-      this.edges.right[i][0] += this.xMov;
-      this.edges.left[i][0] += this.xMov;
-      this.edges.bottom[i][0] += this.xMov;
-      this.edges.top[i][1] += this.yMov;
-      this.edges.right[i][1] += this.yMov;
-      this.edges.left[i][1] += this.yMov;
-      this.edges.bottom[i][1] += this.yMov;
-      if(i >= this.edges.topRight.length) continue;
-      this.edges.topRight[i][1] += this.yMov;
-      this.edges.topLeft[i][1] += this.yMov;
-      this.edges.bottomRight[i][1] += this.yMov;
-      this.edges.bottomLeft[i][1] += this.yMov;
-      this.edges.topRight[i][0] += this.xMov;
-      this.edges.topLeft[i][0] += this.xMov;
-      this.edges.bottomLeft[i][0] += this.xMov;
-      this.edges.bottomRight[i][0] += this.xMov;
+    this.loopLen = this.edges.top.length
+    for(this.i=0; this.i<this.loopLen; this.i++){
+      this.edges.top[this.i][0] += this.xMov;
+      this.edges.right[this.i][0] += this.xMov;
+      this.edges.left[this.i][0] += this.xMov;
+      this.edges.bottom[this.i][0] += this.xMov;
+      this.edges.top[this.i][1] += this.yMov;
+      this.edges.right[this.i][1] += this.yMov;
+      this.edges.left[this.i][1] += this.yMov;
+      this.edges.bottom[this.i][1] += this.yMov;
+      if(this.i >= this.edges.topRight.length) continue;
+      this.edges.topRight[this.i][1] += this.yMov;
+      this.edges.topLeft[this.i][1] += this.yMov;
+      this.edges.bottomRight[this.i][1] += this.yMov;
+      this.edges.bottomLeft[this.i][1] += this.yMov;
+      this.edges.topRight[this.i][0] += this.xMov;
+      this.edges.topLeft[this.i][0] += this.xMov;
+      this.edges.bottomLeft[this.i][0] += this.xMov;
+      this.edges.bottomRight[this.i][0] += this.xMov;
     }
     
   }
