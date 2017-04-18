@@ -16,13 +16,17 @@ export  const Brick = function(id){
   this.offsetLeft = 47;
   this.dead = false;
   this.ballDist = 1000;
-  this.ballDirectionLR = null;
-  this.ballDirectionUD = null;
+  this.paddleDist = 1000;
+  this.moveDirectionLR = null;
+  this.moveDirectionUD = null;
   this.personality = Math.random() + .1;
   this.activeWidth = [0,0];
   this.activeHeight = [0,0];
   this.xChange = 0;
   this.yChange = 0;
+  this.initialX = 0;
+  this.initialY = 0;
+  this.distFromHome = 0;
 
 /* -------------- FUNCTIONS ----------------*/
 
@@ -31,9 +35,10 @@ export  const Brick = function(id){
   this.setInitialPos = function(width, height){
     this.activeHeight = [5, height];
     this.activeWidth = [this.width+this.width*.5*Math.random(), width-this.width+(Math.random()*this.width*.5)];
-    if(this.id == 1) console.log(this.activeHeight);
-    this.x = Math.round((width - this.width) * Math.random());
-    this.y = Math.round((height - this.height) * Math.random());
+    this.initialX = Math.round((this.activeWidth[1] - 5) * Math.random() + 5);
+    this.initialY = Math.round((this.activeHeight[1] - 5) * Math.random() + 5);
+    this.x = this.initialX;
+    this.y = this.initialY;
   }
 
       /* --------- frame change ---------*/
@@ -43,43 +48,52 @@ export  const Brick = function(id){
   this.setY = function(y = this.y){
     this.y = Math.round(y + this.yChange)
   }
-  this.getBallDirections = function(x, y){
-    if(x - this.x > 0) this.ballDirectionLR = -1;
-    else this.ballDirectionLR = 1;
-    if(y - this.y > 0) this.ballDirectionUD = -1;
-    else this.ballDirectionUD = 1;
+  this.getMoveDirections = function(x, y){
+    if(x - this.x > 0) this.moveDirectionLR = -1;
+    else this.moveDirectionLR = 1;
+    if(y - this.y > 0) this.moveDirectionUD = -1;
+    else this.moveDirectionUD = 1;
   }
-  this.stepForward = function(x, y){
-    this.ballDist = Math.sqrt(Math.pow(x-this.x, 2)+Math.pow(y-this.y, 2));
-    this.getBallDirections(x, y);
+  this.restrainXMovement = function(){
     if(this.x < this.activeWidth[0]){
       this.xChange = 0;
-      this.setX(this.activeWidth[0] + 10);
-      return;
+      this.setX(this.activeWidth[0] + 5);
+      return true;
     }else if(this.x > this.activeWidth[1]){
       this.xChange = 0;
-      this.setX(this.activeWidth[1] - 10);
-      return;
+      this.setX(this.activeWidth[1] - 5);
+      return true;
     }
+  }
+  this.restrainYMovement = function(){
     if(this.y < this.activeHeight[0]){
       this.yChange = 0;
-      this.setY(this.activeHeight[0] + 10);
-      return;
+      this.setY(this.activeHeight[0] + 5);
+      return true;
     }else if(this.y > this.activeHeight[1]) {
       this.yChange = 0;
-      this.setY(this.activeHeight[1] - 10);
-      return;
+      this.setY(this.activeHeight[1] - 5);
+      return true;
     }
+  }
+  this.stepForward = function(ballX, ballY, paddleX, paddleY){
+    this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
+    // this.paddleDist = Math.sqrt(Math.pow(paddleX-this.x, 2)+Math.pow(paddleY-this.y, 2));
+
+    if(this.restrainXMovement()) return;
+    if(this.restrainYMovement()) return;
+    
     if(this.ballDist > 350) {
-      this.ballDirectionLR = -this.ballDirectionLR;
-      this.ballDirectionUD = -this.ballDirectionUD;
-      this.xChange = this.ballDirectionLR * 2 + (this.personality * 5 - 2.5);
-      this.yChange = this.ballDirectionUD * 2 + (this.personality * 5 - 2.5);
+      this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
+      this.getMoveDirections(this.initialX, this.initialY);
+      this.xChange = -(this.moveDirectionLR * this.distFromHome / 10)
+      this.yChange = -(this.moveDirectionUD * this.distFromHome / 10)
       this.setX();
       this.setY();
     }else{
-      this.xChange = this.ballDirectionLR*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
-      this.yChange = this.ballDirectionUD*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
+      this.getMoveDirections(ballX, ballY);
+      this.xChange = this.moveDirectionLR*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
+      this.yChange = this.moveDirectionUD*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
       this.setX();
       this.setY();
     }

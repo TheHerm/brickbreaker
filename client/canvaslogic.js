@@ -175,14 +175,14 @@ export const FillCanvas = function(){
     this.loopLen = this.bricks.length;
     for(this.i = 0; this.i<this.loopLen; this.i++) {
       if(this.bricks[this.i].dead) continue;
-      this.bricks[this.i].stepForward(this.xPos, this.yPos);
+      this.bricks[this.i].stepForward(this.xPos, this.yPos, this.paddleX);
       this.bricks[this.i].drawBrick(this.ctx);
     }
   }
   this.drawBall = function(){
     this.ctx.beginPath();
     this.ctx.arc(Math.round(this.xPos), Math.round(this.yPos), this.ballRadius, 0, Math.PI*2);
-    this.ctx.fillStyle = '#60a917';
+    this.ctx.fillStyle = 'rgb(69, 252, 2)';
     this.ctx.fill();
     this.ctx.closePath();
 
@@ -376,7 +376,7 @@ export const FillCanvas = function(){
           }
         }
         colorData = this.ctx.getImageData(x, y, 1, 1).data;
-        if(typeof colorData[0] == 'number' && colorData[0] !== 96 && colorData[1] !==  169 && colorData[2] !== 23) {
+        if(colorData.toString() !== '69,252,2,255') {
           colorData = [];
           if(y>=this.canvas.height-this.paddleHeight*2){
             return {
