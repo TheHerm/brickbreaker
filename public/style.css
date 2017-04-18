@@ -39,9 +39,11 @@ body{
 .spec{
   display: inline-block !important;
   margin: 0 2px;
+  width: 135px !important;
+  height: 90px !important;
 }
 .spec-container{
-  top: 90vh !important;
+  top: 85vh !important;
   display: flex !important;
   margin: 0 10px;
   padding: 5px;

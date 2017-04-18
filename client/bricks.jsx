@@ -27,14 +27,16 @@ export  const Brick = function(id){
   this.initialX = 0;
   this.initialY = 0;
   this.distFromHome = 0;
+  this.xEscape = 1;
+  this.yEscape = -1;
 
 /* -------------- FUNCTIONS ----------------*/
 
       /* --------- initialization ---------*/
 
   this.setInitialPos = function(width, height){
-    this.activeHeight = [5, height];
-    this.activeWidth = [this.width+this.width*.5*Math.random(), width-this.width+(Math.random()*this.width*.5)];
+    this.activeHeight = [5, Math.round(height + 50 * Math.random())];
+    this.activeWidth = [Math.round(this.width+this.width*.5*Math.random()), Math.round(width-this.width-(Math.random()*this.width*.5))];
     this.initialX = Math.round((this.activeWidth[1] - 5) * Math.random() + 5);
     this.initialY = Math.round((this.activeHeight[1] - 5) * Math.random() + 5);
     this.x = this.initialX;
@@ -54,43 +56,68 @@ export  const Brick = function(id){
     if(y - this.y > 0) this.moveDirectionUD = -1;
     else this.moveDirectionUD = 1;
   }
+  this.escapeMoveY = function(){
+    if(this.y < this.activeHeight[0] + this.activeHeight[1] * .1){
+      this.yEscape = 1;
+    }else if( this.y > this.activeHeight[1] - this.activeHeight[1] * .1){
+      this.yEscape = -1;
+    }
+    this.yChange = this.yEscape * (4 * this.personality + 2);
+  }
+  this.escapeMoveX = function(){
+    if(this.x < this.activeWidth[0] + this.activeWidth[1] * .1){
+      this.xEscape = 1;
+    }else if( this.y > this.activeWidth[1] - this.activeWidth[1] * .1){
+      this.xEscape = -1;
+    }
+    this.xChange = this.xEscape * (4 * this.personality + 2);
+  }
   this.restrainXMovement = function(){
-    if(this.x < this.activeWidth[0]){
+    if(this.x <= this.activeWidth[0]){
+      this.escapeMoveY();
       this.xChange = 0;
-      this.setX(this.activeWidth[0] + 5);
+      this.setY();
+      this.setX(this.activeWidth[0]);
       return true;
-    }else if(this.x > this.activeWidth[1]){
+    }else if(this.x >= this.activeWidth[1]){
+      this.escapeMoveY();
       this.xChange = 0;
-      this.setX(this.activeWidth[1] - 5);
+      this.setY();
+      this.setX(this.activeWidth[1]);
       return true;
     }
+    return false
   }
   this.restrainYMovement = function(){
-    if(this.y < this.activeHeight[0]){
+    if(this.y <= this.activeHeight[0]){
+      this.escapeMoveX();
       this.yChange = 0;
-      this.setY(this.activeHeight[0] + 5);
+      this.setX();
+      this.setY(this.activeHeight[0]);
       return true;
-    }else if(this.y > this.activeHeight[1]) {
+    }else if(this.y >= this.activeHeight[1]) {
+      this.escapeMoveX();
       this.yChange = 0;
-      this.setY(this.activeHeight[1] - 5);
+      this.setX();
+      this.setY(this.activeHeight[1]);
       return true;
     }
+    return false;
   }
   this.stepForward = function(ballX, ballY, paddleX, paddleY){
     this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
     // this.paddleDist = Math.sqrt(Math.pow(paddleX-this.x, 2)+Math.pow(paddleY-this.y, 2));
-
-    if(this.restrainXMovement()) return;
-    if(this.restrainYMovement()) return;
     
     if(this.ballDist > 350) {
       this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
       this.getMoveDirections(this.initialX, this.initialY);
-      this.xChange = -(this.moveDirectionLR * this.distFromHome / 10)
-      this.yChange = -(this.moveDirectionUD * this.distFromHome / 10)
+      this.xChange = -(this.moveDirectionLR * this.distFromHome / 100)
+      this.yChange = -(this.moveDirectionUD * this.distFromHome / 100)
       this.setX();
       this.setY();
     }else{
+      if(this.restrainXMovement()) return;
+      if(this.restrainYMovement()) return;
       this.getMoveDirections(ballX, ballY);
       this.xChange = this.moveDirectionLR*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
       this.yChange = this.moveDirectionUD*( 400 / this.ballDist ) + (this.personality * 5 - 2.5);
@@ -102,16 +129,10 @@ export  const Brick = function(id){
           /* --------- draw ---------*/
 
   this.drawBrick = function(ctx){
-    // console.log('hello')
     let drawing = new Image() 
     drawing.src = "evilship.png" 
     ctx.drawImage(drawing, this.x, this.y, this.width, this.height);
 
-    // ctx.beginPath();
-    // ctx.rect(this.x, this.y, this.width, this.height);
-    // ctx.fillStyle = "#e51400";
-    // ctx.fill();
-    // ctx.closePath();
     ctx.beginPath();
     ctx.font = "16px Arial";
     ctx.fillStyle = "white";
