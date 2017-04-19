@@ -25,6 +25,7 @@ export const FillCanvas = function(){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
+  this.paddleSprites = [0, 0];
   this.edges = {
     left: new Array(1).fill([]),
     right: new Array(1).fill([]),
@@ -208,8 +209,14 @@ export const FillCanvas = function(){
     // }
   }
   this.drawPaddle = function() {
+    if(this.paddleSprites[1] > 5) {
+      this.paddleSprites[0] = Math.round((Math.random() * 10000) % 5);
+      this.paddleSprites[1] = 0;
+    }else {
+      this.paddleSprites[1]++;
+    }
     let drawing = new Image() 
-    drawing.src = "Spaceship2.png" 
+    drawing.src = "Spaceship" + this.paddleSprites[0] + ".png" 
     this.ctx.drawImage(drawing, this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
   
