@@ -25,7 +25,7 @@ export const FillCanvas = function(){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-  this.paddleSprites = [0, 0];
+  this.paddleSprites = [[1,0]];
   this.edges = {
     left: new Array(1).fill([]),
     right: new Array(1).fill([]),
@@ -48,6 +48,7 @@ export const FillCanvas = function(){
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
       this.setBallPixelArray(this.xPos, this.yPos);
       this.createBricks();
+      this.initializeSprites();
       this.animate();
     }else {
       this.endGame = false;
@@ -132,6 +133,12 @@ export const FillCanvas = function(){
     this.collisionDetection();
     requestAnimationFrame(this.animate);
   }
+  this.initializeSprites = function(){
+    for(this.i = 1; this.i<7; this.i++){
+      this.paddleSprites[this.i] = new Image();
+      this.paddleSprites[this.i].src = `Spaceship${this.i-1}.png`;
+    }
+  }
 
     /*--- DRAW --- */
   
@@ -209,15 +216,14 @@ export const FillCanvas = function(){
     // }
   }
   this.drawPaddle = function() {
-    if(this.paddleSprites[1] > 5) {
-      this.paddleSprites[0] = Math.round((Math.random() * 10000) % 5);
-      this.paddleSprites[1] = 0;
+    if(this.paddleSprites[0][1] > 5) {
+      this.paddleSprites[0][0] = Math.round((Math.random() * 10000) % 5) + 1;
+      this.paddleSprites[0][1] = 0;
     }else {
-      this.paddleSprites[1]++;
+      this.paddleSprites[0][1]++;
     }
-    let drawing = new Image() 
-    drawing.src = "Spaceship" + this.paddleSprites[0] + ".png" 
-    this.ctx.drawImage(drawing, this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
+    console.log('trying to draw', this.paddleSprites[0][0])
+    this.ctx.drawImage(this.paddleSprites[this.paddleSprites[0][0]], this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
   
     /*--- COLLISION --- */
