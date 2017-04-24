@@ -30,6 +30,8 @@ export  const Brick = function(id){
   this.xEscape = 1;
   this.yEscape = -1;
   this.lastBallDist = 0;
+  this.circleRadius = (Math.random() * 10000000) % 60 + 15;
+  this.circleDirection = 0;
 
 /* -------------- FUNCTIONS ----------------*/
 
@@ -41,6 +43,7 @@ export  const Brick = function(id){
     this.initialY = Math.round((this.activeHeight[1] - 5) * Math.random() + 5);
     this.x = this.initialX;
     this.y = this.initialY;
+    Math.random() >= .5 ? this.circleDirection = 1 : this.circleDirection = -1; 
   }
   this.setActiveWidthAndHeight = function(width, height){
     this.activeHeight = [5, Math.round(height + 50 * Math.random())];
@@ -104,29 +107,24 @@ export  const Brick = function(id){
     }
     return false;
   }
+  this.circleHome = function(){
+    
+    this.setX(undefined, );
+    this.setY(undefined, );
+  }
   this.stepForward = function(ballX, ballY, paddleX, paddleY){
-
-/*
-
-thinking about adding in some functionality to change brick behavior if ball is moving towards
-using this.ballDist and this.lastBallDist to infer if ball getting closer or moving away
-
-add in holding pattern behavior so brick circles around its home
-
-
-
-
-*/
-
     this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
     this.lastBallDist = this.ballDist;
     // this.paddleDist = Math.sqrt(Math.pow(paddleX-this.x, 2)+Math.pow(paddleY-this.y, 2));
-    
     if(this.ballDist > 275) {
       this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
-      this.getMoveDirections(this.initialX, this.initialY);
-      this.setX(undefined, (-this.moveDirectionLR * this.distFromHome / 100) );
-      this.setY(undefined, (-this.moveDirectionUD * this.distFromHome / 100) );
+      if(this.distFromHome > this.circleRadius){
+        this.getMoveDirections(this.initialX, this.initialY);
+        this.setX(undefined, (-this.moveDirectionLR * this.distFromHome / 100) );
+        this.setY(undefined, (-this.moveDirectionUD * this.distFromHome / 100) );
+      }else {
+        this.circleHome();
+      }
     }else{
       if(this.restrainXMovement()) return;
       if(this.restrainYMovement()) return;

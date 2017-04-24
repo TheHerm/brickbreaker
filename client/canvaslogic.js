@@ -222,7 +222,6 @@ export const FillCanvas = function(){
     }else {
       this.paddleSprites[0][1]++;
     }
-    console.log('trying to draw', this.paddleSprites[0][0])
     this.ctx.drawImage(this.paddleSprites[this.paddleSprites[0][0]], this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
   
