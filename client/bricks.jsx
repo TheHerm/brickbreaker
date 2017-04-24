@@ -49,7 +49,7 @@ export  const Brick = function(id){
   }
   this.findHoldingPattern = function(){
     let opp=0, adj=0, circleAngle=0, circleMove, circleRadius = this.circleRadius, tempAngle;
-    Math.random() >= .5 ? circleMove = -20 * this.personality : circleMove = 20 * this.personality;
+    Math.random() >= .5 ? circleMove = -this.personality/5 : circleMove = this.personality/5;
     this.holdingPattern[1] = [Math.round(this.initialX + circleRadius), this.initialY];
     circleAngle += circleMove;
     while( !( circleAngle > -Math.abs(circleMove) && circleAngle < Math.abs(circleMove) ) ){
@@ -77,7 +77,7 @@ export  const Brick = function(id){
       this.holdingPattern.push([Math.round(this.initialX + adj), Math.round(this.initialY + opp)]);        
       circleAngle += circleMove;
     }
-    if(this.id === 1)console.log(this.holdingPattern);
+    console.log(this.holdingPattern);
   }
 
       /* --------- behavior ---------*/
@@ -152,22 +152,22 @@ export  const Brick = function(id){
   }
   this.stepForward = function(ballX, ballY, paddleX, paddleY){
     this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
-    this.lastBallDist = this.ballDist;
-    // this.paddleDist = Math.sqrt(Math.pow(paddleX-this.x, 2)+Math.pow(paddleY-this.y, 2));
     if(this.ballDist > 275) {
       this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
-      if(this.distFromHome > this.circleRadius){
+      if(this.distFromHome >= this.circleRadius + 5){
+        if(this.id === 1)console.log('move toward home\n', this.ballDist, this.distFromHome, this.circleRadius+5)
         this.getMoveDirections(this.initialX, this.initialY);
         this.setX(undefined, (-this.moveDirectionLR * this.distFromHome / 100) );
         this.setY(undefined, (-this.moveDirectionUD * this.distFromHome / 100) );
       }else {
+        if(this.id === 1)console.log('holding pattern\n', this.ballDist, this.distFromHome, this.circleRadius+5)
         if(this.holdingPatternSpot === this.holdingPatternLen - 1) this.holdingPatternSpot = 0;
-        if(this.holdingPattern[0] === 7) {
+        // if(this.holdingPattern[0] === 7) {
           this.holdingPatternSpot++;
-          this.holdingPattern[0] = -1;
-        }
-        this.holdingPattern[0]++;
-        if(this.id === 1) console.log(this.holdingPatternSpot, this.holdingPattern[0], this.holdingPatternLen);
+          // this.holdingPattern[0] = -1;
+        // }
+        // this.holdingPattern[0]++;
+        // if(this.id === 1) console.log(this.holdingPatternSpot, this.holdingPattern[0], this.holdingPatternLen);
         this.setX(this.holdingPattern[this.holdingPatternSpot][0], 0)
         this.setY(this.holdingPattern[this.holdingPatternSpot][1], 0)
       }
@@ -192,6 +192,13 @@ export  const Brick = function(id){
     ctx.fillStyle = "white";
     ctx.fillText(this.id, this.x+20, this.y+20);
     ctx.closePath();
+
+    // for(let i = 1; i<this.holdingPatternLen-1; i++){
+    //   ctx.beginPath();
+    //   ctx.fillStyle = "white";
+    //   ctx.fill(this.id, this.x+20, this.y+20);
+    //   ctx.closePath();
+    // }
   }
 
       /* --------- util functions ---------*/
