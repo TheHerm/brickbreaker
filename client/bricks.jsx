@@ -77,7 +77,6 @@ export  const Brick = function(id){
       this.holdingPattern.push([Math.round(this.initialX + adj), Math.round(this.initialY + opp)]);        
       circleAngle += circleMove;
     }
-    console.log(this.holdingPattern);
   }
 
       /* --------- behavior ---------*/
@@ -155,12 +154,13 @@ export  const Brick = function(id){
     if(this.ballDist > 275) {
       this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
       if(this.distFromHome >= this.circleRadius + 5){
-        if(this.id === 1)console.log('move toward home\n', this.ballDist, this.distFromHome, this.circleRadius+5)
+        // console.log(this.id, '-->>', this.distFromHome, this.circleRadius+5)
         this.getMoveDirections(this.initialX, this.initialY);
-        this.setX(undefined, (-this.moveDirectionLR * this.distFromHome / 100) );
-        this.setY(undefined, (-this.moveDirectionUD * this.distFromHome / 100) );
+        // console.log('x, y', -(this.moveDirectionLR * (this.distFromHome / 100 + 1)), -(this.moveDirectionUD * (this.distFromHome / 100 + 1)));
+        this.setX(undefined, -this.moveDirectionLR * (this.distFromHome / 100 + 1) );
+        this.setY(undefined, -this.moveDirectionUD * (this.distFromHome / 100 + 1) );
       }else {
-        if(this.id === 1)console.log('holding pattern\n', this.ballDist, this.distFromHome, this.circleRadius+5)
+        // console.log('holding pattern', this.id, '\n', this.ballDist, this.distFromHome, this.circleRadius+5)
         if(this.holdingPatternSpot === this.holdingPatternLen - 1) this.holdingPatternSpot = 0;
         // if(this.holdingPattern[0] === 7) {
           this.holdingPatternSpot++;
