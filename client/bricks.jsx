@@ -1,4 +1,6 @@
-export  const Brick = function(id){
+import {Bullets} from './bullets.jsx';
+
+export  const Brick = function(id, canvasHeight){
 
 /* -------------- VARIABLES ----------------*/
 
@@ -9,6 +11,7 @@ export  const Brick = function(id){
   this.yMov = 0;
   this.width = 50;
   this.height = 70;
+  this.canvasHeight = canvasHeight;
   this.dead = false;
   this.ballDist = 1000;
   this.paddleDist = 1000;
@@ -25,10 +28,13 @@ export  const Brick = function(id){
   this.xEscape = 1;
   this.yEscape = -1;
   this.lastBallDist = 0;
-  this.holdingPattern = [0];
+  this.holdingPattern = [];
   this.holdingPatternSpot = 0;
   this.holdingPatternLen = 0;
   this.circleRadius = (Math.random() * 10000000) % 60 + 15;
+  this.bullet = null;
+  this.drawing = new Image() 
+  this.drawing.src = "evilship.png" 
 
 /* -------------- FUNCTIONS ----------------*/
 
@@ -39,8 +45,8 @@ export  const Brick = function(id){
     this.initialX = Math.round((this.activeWidth[1] - 5) * Math.random() + 5);
     this.initialY = Math.round((this.activeHeight[1] - 5) * Math.random() + 5);
     this.findHoldingPattern();
-    this.x = this.holdingPattern[1][0];
-    this.y = this.holdingPattern[1][1];
+    this.x = this.holdingPattern[0][0];
+    this.y = this.holdingPattern[0][1];
     this.holdingPatternLen = this.holdingPattern.length;
   }
   this.setActiveWidthAndHeight = function(width, height){
@@ -50,7 +56,7 @@ export  const Brick = function(id){
   this.findHoldingPattern = function(){
     let opp=0, adj=0, circleAngle=0, circleMove, circleRadius = this.circleRadius, tempAngle;
     Math.random() >= .5 ? circleMove = -this.personality/5 : circleMove = this.personality/5;
-    this.holdingPattern[1] = [Math.round(this.initialX + circleRadius), this.initialY];
+    this.holdingPattern[0] = [Math.round(this.initialX + circleRadius), this.initialY];
     circleAngle += circleMove;
     while( !( circleAngle > -Math.abs(circleMove) && circleAngle < Math.abs(circleMove) ) ){
       if(circleAngle >= 180){
@@ -108,7 +114,7 @@ export  const Brick = function(id){
     }
     this.xChange = this.xEscape * (4 * this.personality + 2);
   }
-  this.restrainXMovement = function(){
+  this.restrainXMovement = function(ballX){
     if(this.x <= this.activeWidth[0]){
       this.escapeMoveY();
       this.setY();
@@ -122,7 +128,7 @@ export  const Brick = function(id){
     }
     return false
   }
-  this.restrainYMovement = function(){
+  this.restrainYMovement = function(ballY){
     if(this.y <= this.activeHeight[0]){
       this.escapeMoveX();
       this.setX();
@@ -149,31 +155,40 @@ export  const Brick = function(id){
     this.setX(undefined, undefined);
     this.setY(undefined, undefined);
   }
-  this.stepForward = function(ballX, ballY, paddleX, paddleY){
-    this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
-    if(this.ballDist > 275) {
-      this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
+  this.ballFarAway = function(){
+    this.distFromHome = Math.sqrt(Math.pow(this.initialX-this.x, 2)+Math.pow(this.initialY-this.y, 2));
       if(this.distFromHome >= this.circleRadius + 5){
-        // console.log(this.id, '-->>', this.distFromHome, this.circleRadius+5)
         this.getMoveDirections(this.initialX, this.initialY);
-        // console.log('x, y', -(this.moveDirectionLR * (this.distFromHome / 100 + 1)), -(this.moveDirectionUD * (this.distFromHome / 100 + 1)));
         this.setX(undefined, -this.moveDirectionLR * (this.distFromHome / 100 + 1) );
         this.setY(undefined, -this.moveDirectionUD * (this.distFromHome / 100 + 1) );
       }else {
-        // console.log('holding pattern', this.id, '\n', this.ballDist, this.distFromHome, this.circleRadius+5)
-        if(this.holdingPatternSpot === this.holdingPatternLen - 1) this.holdingPatternSpot = 0;
-        // if(this.holdingPattern[0] === 7) {
-          this.holdingPatternSpot++;
-          // this.holdingPattern[0] = -1;
-        // }
-        // this.holdingPattern[0]++;
-        // if(this.id === 1) console.log(this.holdingPatternSpot, this.holdingPattern[0], this.holdingPatternLen);
+        if(this.holdingPatternSpot === this.holdingPatternLen - 1) this.holdingPatternSpot = -1;
+        this.holdingPatternSpot++;
         this.setX(this.holdingPattern[this.holdingPatternSpot][0], 0)
         this.setY(this.holdingPattern[this.holdingPatternSpot][1], 0)
       }
+  }
+  this.controlBullet = function(paddleX){
+    if(this.bullet) {
+      this.bullet.stepForward(paddleX);
+      return;
+    }
+    if(Math.random() < .2 ) {
+      console.log('creating bullet')
+      this.bullet = new Bullets(this.x, this.y, paddleX);
+    }
+  }
+  this.advanceBullet = function(){
+
+  }
+  this.stepForward = function(ballX, ballY, paddleX){
+    this.controlBullet(paddleX);
+    this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
+    if(this.ballDist > 275) {
+      this.ballFarAway();
     }else{
-      if(this.restrainXMovement()) return;
-      if(this.restrainYMovement()) return;
+      if(this.restrainXMovement(ballY)) return;
+      if(this.restrainYMovement(ballY)) return;
       this.getMoveDirections(ballX, ballY);
       this.setX(undefined, this.moveDirectionLR*( 400 / this.ballDist ) + (this.personality * 5 - 2.5));
       this.setY(undefined, this.moveDirectionUD*( 400 / this.ballDist ) + (this.personality * 5 - 2.5));
@@ -183,9 +198,7 @@ export  const Brick = function(id){
           /* --------- draw ---------*/
 
   this.drawBrick = function(ctx){
-    let drawing = new Image() 
-    drawing.src = "evilship.png" 
-    ctx.drawImage(drawing, this.x, this.y, this.width, this.height);
+    ctx.drawImage(this.drawing, this.x, this.y, this.width, this.height);
 
     ctx.beginPath();
     ctx.font = "16px Arial";
@@ -193,12 +206,7 @@ export  const Brick = function(id){
     ctx.fillText(this.id, this.x+20, this.y+20);
     ctx.closePath();
 
-    // for(let i = 1; i<this.holdingPatternLen-1; i++){
-    //   ctx.beginPath();
-    //   ctx.fillStyle = "white";
-    //   ctx.fill(this.id, this.x+20, this.y+20);
-    //   ctx.closePath();
-    // }
+    if(this.bullet) this.bullet.drawBullet(ctx);
   }
 
       /* --------- util functions ---------*/

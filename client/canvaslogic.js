@@ -20,7 +20,7 @@ export const FillCanvas = function(){
   this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
   this.rightPressed = false;
   this.leftPressed = false;
-  this.brickCount = 10;
+  this.brickCount = 5;
   this.bricks = new Array(this.brickCount).fill({dead: true});
   this.score = 0;
   this.lives = 3;
@@ -123,7 +123,7 @@ export const FillCanvas = function(){
   }
   this.createBricks = function(){
     for(this.i = 0; this.i<this.brickCount; this.i++){
-      this.bricks[this.i] = new Brick(this.i+1);
+      this.bricks[this.i] = new Brick(this.i+1, this.canvas.height);
       this.bricks[this.i].setInitialPos(this.canvas.width, this.canvas.height / 2);
     }
   }
