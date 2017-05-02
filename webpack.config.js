@@ -10,6 +10,9 @@ module.exports = {
   },
   context: __dirname,
   devtool: 'source-map',
+  node: {
+    fs: "empty"
+  },
   module: {
     loaders: [
       {
