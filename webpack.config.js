@@ -13,18 +13,26 @@ module.exports = {
   node: {
     fs: "empty"
   },
+  resolve: {
+    extensions: ['', '.js', '.jsx', '.json']
+  },
   module: {
-    preLoaders: [
-        { test: /\.json$/, loader: 'json'},
-    ],
     loaders: [
       {
-        test: /jsx?$/,
+        test: /.jsx$/,
         exclude: /(node_modules|bower_components)/,
         loader: 'babel',
         query: {
           presets: ['react', 'es2015']
         }
+      },
+      { test: /.js$/, 
+        exclude: /(node_modules|bower_components)/, 
+        loader: 'babel'
+      },
+      { 
+        test: /.json$/, 
+        loader: 'json-loader'
       }
     ]
   }
