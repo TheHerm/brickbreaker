@@ -23,6 +23,7 @@
     "fs": "0.0.1-security",
     "http": "0.0.0",
     "jasmine": "^2.5.3",
+    "json": "^9.0.6",
     "json-loader": "^0.5.4",
     "mocha": "^3.2.0",
     "net": "^1.0.2",
