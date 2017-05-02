@@ -14,6 +14,9 @@ module.exports = {
     fs: "empty"
   },
   module: {
+    preLoaders: [
+        { test: /\.json$/, loader: 'json'},
+    ],
     loaders: [
       {
         test: /jsx?$/,
