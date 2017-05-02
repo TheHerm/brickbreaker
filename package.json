@@ -1,10 +1,10 @@
 {
-  "name": "react-bones-ah",
+  "name": "AlienBrickBreaker",
   "version": "1.0.0",
-  "description": "This is a fully tested bare-bones react starter app",
+  "description": "Destroy the alien spaceships with your all powerful ball. You only have three, so be careful and don't lose them!",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch server -e js,html,jsx server/index.js",
+    "start": "webpack -w server -e js,html,jsx server/index.js",
     "test": "mocha --compilers js:babel-register client/*.test.jsx server/**/*.test.js redux/**/*.test.js",
     "build": "webpack -w"
   },
@@ -42,12 +42,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheHerm/react-bones-ah.git"
+    "url": "git+https://github.com/TheHerm/BrickBreaker"
   },
   "author": "TheHerm",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/TheHerm/react-bones-ah/issues"
+    "url": "https://github.com/TheHerm/BrickBreaker/issues"
   },
-  "homepage": "https://github.com/TheHerm/react-bones-ah#readme"
+  "homepage": "https://github.com/TheHerm/BrickBreaker#readme"
 }
