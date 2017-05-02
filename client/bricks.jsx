@@ -170,16 +170,12 @@ export  const Brick = function(id, canvasHeight){
   }
   this.controlBullet = function(paddleX){
     if(this.bullet) {
-      this.bullet.stepForward(paddleX);
+      this.bullet.stepForward();
       return;
     }
     if(Math.random() < .2 ) {
-      console.log('creating bullet')
-      this.bullet = new Bullets(this.x, this.y, paddleX);
+      this.bullet = new Bullets(this.x, this.y, paddleX, this.width, this.height, this.canvasHeight);
     }
-  }
-  this.advanceBullet = function(){
-
   }
   this.stepForward = function(ballX, ballY, paddleX){
     this.controlBullet(paddleX);
