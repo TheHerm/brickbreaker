@@ -6,8 +6,6 @@ export  const Bullets = function(brickX, brickY, paddleX, brickWidth, brickHeigh
   this.y = 0;
   this.yChange = 0;
   this.xChange = 0;
-  this.xMov = 0;
-  this.yMov = 0;
   this.width = 30;
   this.height = 70;
   this.drawing = null;
@@ -34,15 +32,16 @@ export  const Bullets = function(brickX, brickY, paddleX, brickWidth, brickHeigh
     this.bulletAngle = Math.atan2(opp, adj);
   }
   this.setXYChange = function(){
-
+    this.yChange = Math.random() + 1;
+    this.xChange = this.yChange * -this.bulletAngle;
   }
 
       /* --------- behavior ---------*/
   this.setX = function(x = this.x, change = this.xChange){
-    this.x = Math.round(x + change)
+    this.x = x + change;
   }
   this.setY = function(y = this.y, change = this.yChange){
-    this.y = Math.round(y + change)
+    this.y = y + change;
   }
   this.stepForward = function(){
     this.setY();
@@ -53,7 +52,7 @@ export  const Bullets = function(brickX, brickY, paddleX, brickWidth, brickHeigh
 
   this.drawBullet = function(ctx){
     ctx.save();
-    ctx.translate(this.x, this.y);
+    ctx.translate(Math.round(this.x), Math.round(this.y));
     ctx.rotate(this.bulletAngle);
     ctx.drawImage(this.drawing, 0, 0, this.width, this.height);
     ctx.translate(0,0);
