@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server -e js,html,jsx server/index.js",
     "test": "mocha --compilers js:babel-register client/*.test.jsx server/**/*.test.js redux/**/*.test.js",
-    "build": "webpack"
+    "build": "webpack",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "babel": "^5.8.38",
