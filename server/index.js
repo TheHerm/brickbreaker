@@ -8,14 +8,13 @@ var app = express();
 
 server.on('request', app);
 
-server.listen(4567, function () {
-    console.log('The server is listening on port 4567!');
+server.listen(process.env.PORT || 4567, function () {
+    console.log('The server is listening on port', process.env.PORT || 4567);
 });
 
 app.use(express.static('public'));
 
-app.get('/main', function (req, res) {
-    console.log('sending file....')
+app.get('/', function (req, res) {
     res.sendFile('index.html');
 });
 
