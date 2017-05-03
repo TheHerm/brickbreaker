@@ -14,7 +14,8 @@ server.listen(4567, function () {
 
 app.use(express.static('public'));
 
-app.get('/', function (req, res) {
+app.get('/main', function (req, res) {
+    console.log('sending file....')
     res.sendFile('index.html');
 });
 
