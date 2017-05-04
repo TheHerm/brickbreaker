@@ -28,6 +28,7 @@ export const FillCanvas = function(){
   this.lives = 3;
   this.endGame = false;
   this.paddleSprites = [[1,0]];
+  this.sounds = new Array(5);
   this.edges = {
     left: new Array(1).fill([]),
     right: new Array(1).fill([]),
@@ -51,6 +52,7 @@ export const FillCanvas = function(){
       this.setBallPixelArray(this.xPos, this.yPos);
       this.createBricks();
       this.initializeSprites();
+      this.initializeSounds();
       this.animate();
     }else {
       this.endGame = false;
@@ -140,6 +142,12 @@ export const FillCanvas = function(){
       this.paddleSprites[this.i] = new Image();
       this.paddleSprites[this.i].src = `Spaceship${this.i-1}.png`;
     }
+  }
+  this.initializeSounds = function(){
+    this.sounds[0] = new Audio("bounce.mp3");
+    this.sounds[0].playbackRate = 2;
+    this.sounds[1] = new Audio("explosion.mp3");
+    this.sounds[1].playbackRate = 1;
   }
 
     /*--- DRAW --- */
@@ -258,6 +266,7 @@ export const FillCanvas = function(){
       if(this.bricks[this.i].dead) continue;
       if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
         this.score++;
+        this.sounds[1].play();
         this.checkEnd();
         return;
       }
@@ -290,6 +299,7 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
+      this.sounds[0].play();
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y');
@@ -470,6 +480,8 @@ export const FillCanvas = function(){
 
   /*-------------------- NOTES ------------------------------- */
 
+// var snd = new Audio("file.wav"); // buffers automatically when created
+// snd.play();
 
   // this.keyDownHandler = this.keyDownHandler.bind(this);
   // this.keyUpHandler = this.keyUpHandler.bind(this);
