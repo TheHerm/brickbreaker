@@ -1,4 +1,4 @@
-export  const Bullets = function(brickX, brickY, paddleX, brickWidth, brickHeight, canvasHeight){
+export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight, canvasHeight){
 
 /* -------------- VARIABLES ----------------*/
 

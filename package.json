@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node server -e js,html,jsx server/index.js",
+    "start-w": "nodemon server -e js,html,jsx server/index.js",
     "test": "mocha --compilers js:babel-register client/*.test.jsx server/**/*.test.js redux/**/*.test.js",
     "build": "webpack",
+    "build-w": "webpack -w",
     "postinstall": "npm run build"
   },
   "dependencies": {

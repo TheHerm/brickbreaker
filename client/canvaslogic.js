@@ -1,4 +1,5 @@
 import {Brick} from './bricks.jsx';
+import {Bullet} from './bullets.jsx';
 
 export const FillCanvas = function(){
 
@@ -22,6 +23,7 @@ export const FillCanvas = function(){
   this.leftPressed = false;
   this.brickCount = 5;
   this.bricks = new Array(this.brickCount).fill({dead: true});
+  this.enemyBullets = new Array(this.brickCount).fill(null);
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
@@ -153,7 +155,7 @@ export const FillCanvas = function(){
     this.drawLives();
     this.drawBall();
     this.drawPaddle();
-    this.drawBricks();
+    this.drawBricksAndBullets();
   }
   this.drawLives = function() {
     this.ctx.beginPath();
@@ -179,12 +181,34 @@ export const FillCanvas = function(){
     this.ctx.fillText("Score: " + this.score, 5, 16);
     this.ctx.closePath();
   }
-  this.drawBricks = function() {
+  this.drawBricksAndBullets = function() {
     this.loopLen = this.bricks.length;
     for(this.i = 0; this.i<this.loopLen; this.i++) {
-      if(this.bricks[this.i].dead) continue;
-      this.bricks[this.i].stepForward(this.xPos, this.yPos, this.paddleX);
-      this.bricks[this.i].drawBrick(this.ctx);
+      if(!this.bricks[this.i].dead){
+        this.bricks[this.i].stepForward(this.xPos, this.yPos, this.paddleX);
+        this.bricks[this.i].drawBrick(this.ctx);
+      }
+      this.drawBullets();
+    }
+  }
+  this.fireNewBullet = function(){
+    if(Math.random() < .02){
+      this.brick = this.bricks[this.i];
+      this.enemyBullets[this.i] = new Bullet(this.brick.x, this.brick.y, this.paddleX, this.brick.width, this.brick.height, this.canvas.height);
+    }
+  }
+  this.drawBullets = function(){
+    if(!this.enemyBullets[this.i] && !this.bricks[this.i].dead) {
+      this.fireNewBullet();
+      return;
+    }else if(this.enemyBullets[this.i]){
+      this.enemyBullets[this.i].stepForward();
+      if(this.enemyBullets[this.i].y >= this.canvas.height){
+        delete this.enemyBullets[this.i];
+      }else {
+        this.enemyBullets[this.i].drawBullet(this.ctx);
+      }
+
     }
   }
   this.drawBall = function(){
@@ -437,7 +461,7 @@ export const FillCanvas = function(){
   this.animate = this.animate.bind(this);
   this.mouseMoveHandler = this.mouseMoveHandler.bind(this);
   this.collisionDetection = this.collisionDetection.bind(this);
-  this.drawBricks = this.drawBricks.bind(this);
+  this.drawBricksAndBullets = this.drawBricksAndBullets.bind(this);
   this.drawBall = this.drawBall.bind(this);
   this.moveCircleEdges = this.moveCircleEdges.bind(this);
   this.checkCircleEdgesForCollision = this.checkCircleEdgesForCollision.bind(this);

@@ -1,6 +1,5 @@
-import {Bullets} from './bullets.jsx';
 
-export  const Brick = function(id, canvasHeight){
+export  const Brick = function(id){
 
 /* -------------- VARIABLES ----------------*/
 
@@ -11,7 +10,6 @@ export  const Brick = function(id, canvasHeight){
   this.yMov = 0;
   this.width = 50;
   this.height = 70;
-  this.canvasHeight = canvasHeight;
   this.dead = false;
   this.ballDist = 1000;
   this.paddleDist = 1000;
@@ -32,7 +30,6 @@ export  const Brick = function(id, canvasHeight){
   this.holdingPatternSpot = 0;
   this.holdingPatternLen = 0;
   this.circleRadius = (Math.random() * 10000000) % 60 + 15;
-  this.bullet = null;
   this.drawing = new Image() 
   this.drawing.src = "evilship.png" 
 
@@ -168,17 +165,17 @@ export  const Brick = function(id, canvasHeight){
         this.setY(this.holdingPattern[this.holdingPatternSpot][1], 0)
       }
   }
-  this.controlBullet = function(paddleX){
-    if(this.bullet) {
-      this.bullet.stepForward();
-      return;
-    }
-    if(Math.random() < .2 ) {
-      this.bullet = new Bullets(this.x, this.y, paddleX, this.width, this.height, this.canvasHeight);
-    }
-  }
+  // this.controlBullet = function(paddleX){
+  //   if(this.bullet) {
+  //     this.bullet.stepForward();
+  //     return;
+  //   }
+  //   if(Math.random() < .2 ) {
+  //     this.bullet = new Bullets(this.x, this.y, paddleX, this.width, this.height, this.canvasHeight);
+  //   }
+  // }
   this.stepForward = function(ballX, ballY, paddleX){
-    this.controlBullet(paddleX);
+    // this.controlBullet(paddleX);
     this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
     if(this.ballDist > 275) {
       this.ballFarAway();
@@ -195,14 +192,11 @@ export  const Brick = function(id, canvasHeight){
 
   this.drawBrick = function(ctx){
     ctx.drawImage(this.drawing, this.x, this.y, this.width, this.height);
-
     ctx.beginPath();
     ctx.font = "16px Arial";
     ctx.fillStyle = "white";
     ctx.fillText(this.id, this.x+20, this.y+20);
     ctx.closePath();
-
-    if(this.bullet) this.bullet.drawBullet(ctx);
   }
 
       /* --------- util functions ---------*/
