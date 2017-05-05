@@ -466,6 +466,7 @@ export const BrickBreaker = function(update){
       this.score = this.brickCount - this.tempBrickCount;
       update();
     }
+    this.checkEnd();
   }
   this.updateLives = function(){
     this.lives--;

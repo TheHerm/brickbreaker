@@ -211,8 +211,8 @@ export  const Brick = function(id){
   this.activateExplosion = function(){
     this.explode.x = this.x;
     this.explode.y = this.y;
-    this.explode.height = this.height;
-    this.explode.width = this.width;
+    this.explode.height = this.height - this.height/2;
+    this.explode.width = this.width - this.width/2;
     this.explode.explode = true;
   }
   this.checkCollision = function(x, y){
