@@ -9,11 +9,11 @@ export class MainContainer extends React.Component{
     super(props);
     // javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()
     // window.addEventListener('load', function () {
-      let specDiv = document.body.children.item(1)
-      specDiv.className = 'spec-container';
-      specDiv.children.item(0).className = 'spec';
-      specDiv.children.item(1).className = 'spec';
-      specDiv.children.item(2).className = 'spec';
+      // let specDiv = document.body.children.item(1)
+      // specDiv.className = 'spec-container';
+      // specDiv.children.item(0).className = 'spec';
+      // specDiv.children.item(1).className = 'spec';
+      // specDiv.children.item(2).className = 'spec';
     // });
 }
 
