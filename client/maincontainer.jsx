@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import $ from 'jquery';
 import Store from '../redux/store.js';
 import CanvasContainer from './canvas.jsx';
 
@@ -13,12 +14,14 @@ export class MainContainer extends React.Component{
       specDiv.children.item(0).className = 'spec';
       specDiv.children.item(1).className = 'spec';
       specDiv.children.item(2).className = 'spec';
-    })
+    });
 }
+
+
 
   render(){
     return (
-      <CanvasContainer />
+      <CanvasContainer height={$(document).height() - 20} width={Math.round($(document).width() * 4/5)}/>
     )
   }
 }

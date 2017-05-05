@@ -21,7 +21,7 @@ class CanvasContainer extends React.Component{
 
   handleStartGame(){
     this.setState({ start: 1 });
-    this.state.game.startGame();
+    this.state.game.startGame(this.props.height, this.props.width);
   }
 
   handleEndGame(){
@@ -32,13 +32,31 @@ class CanvasContainer extends React.Component{
   render(){
     return (
       <div className="canvas-container">
-        <canvas id="myCanvas" width="1000" height="650"></canvas>
-        {
-          !this.state.start && <div><button className="start-btn" autoFocus onClick={this.handleStartGame}>Start Game</button></div>
-        }
-        {
-          !!this.state.start && <div><button className="pause-btn" autoFocus onClick={this.handleEndGame}>Pause Game</button></div>
-        }
+        <div>
+          {
+            !this.state.start && <div><button className="start-btn" autoFocus onClick={this.handleStartGame}>Start Game</button></div>
+          }
+          {
+            !!this.state.start && <div><button className="pause-btn" autoFocus onClick={this.handleEndGame}>Pause Game</button></div>
+          }
+          <div>
+            LIVES:
+          </div>
+          <div>
+            {
+              this.state.game && this.state.game.lives
+            }
+          </div>
+          <div>
+            SCORE:
+          </div>
+          <div>
+            {
+              this.state.game && this.state.game.score
+            }
+          </div>
+        </div>
+        <canvas id="myCanvas" width={this.props.width} height={this.props.height}></canvas>
       </div>
     )
   }

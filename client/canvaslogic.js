@@ -7,6 +7,7 @@ export const FillCanvas = function(){
 
   this.canvas = document.getElementById('myCanvas');
   this.ctx = this.canvas.getContext('2d');
+  this.background = new Image();
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
@@ -52,7 +53,11 @@ export const FillCanvas = function(){
       this.setBallPixelArray(this.xPos, this.yPos);
       this.createBricks();
       this.initializeSprites();
+      this.background.src = "spacebackground.jpg";
       this.initializeSounds();
+      this.sounds[3].pause();
+      this.sounds[3].currentTime = 0;
+      this.sounds[3].play();
       this.animate();
     }else {
       this.endGame = false;
@@ -148,46 +153,26 @@ export const FillCanvas = function(){
     this.sounds[0].playbackRate = 2;
     this.sounds[1] = new Audio("explosion.mp3");
     this.sounds[1].playbackRate = 1;
+    this.sounds[1].volume = .2;
+    this.sounds[2] = new Audio("laser.mp3");
+    this.sounds[2].playbackRate = 1;
+    this.sounds[2].volume = .1;
+    this.sounds[3] = new Audio("start_noise.mp3");
+    this.sounds[3].playbackRate = 1;
+    this.sounds[4] = new Audio("paddle_bounce.mp3");
+    this.sounds[4].playbackRate = 1;
   }
 
     /*--- DRAW --- */
   
   this.draw = function() {
-    let drawing = new Image() 
-    drawing.src = "spacebackground.jpg" 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(drawing, -1, -1, 1002, 652);
+    this.ctx.drawImage(this.background, -1, -1, this.canvas.width, this.canvas.height);
     this.xPos += this.xMov;
     this.yPos += this.yMov;
-    this.drawScore();
-    this.drawLives();
     this.drawBall();
     this.drawPaddle();
     this.drawBricksAndBullets();
-  }
-  this.drawLives = function() {
-    this.ctx.beginPath();
-    this.ctx.rect(this.canvas.width-70, 0, 70, 20);
-    this.ctx.fillStyle = "#1ba1e2";
-    this.ctx.fill();
-    this.ctx.closePath();
-    this.ctx.beginPath();
-    this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "white";
-    this.ctx.fillText("Lives: " + this.lives, this.canvas.width-62, 16);
-    this.ctx.closePath();
-  }
-  this.drawScore = function() {
-    this.ctx.beginPath();
-    this.ctx.rect(0, 0, 75, 20);
-    this.ctx.fillStyle = "#1ba1e2";
-    this.ctx.fill();
-    this.ctx.closePath();
-    this.ctx.beginPath();
-    this.ctx.font = "16px Arial";
-    this.ctx.fillStyle = "white";
-    this.ctx.fillText("Score: " + this.score, 5, 16);
-    this.ctx.closePath();
   }
   this.drawBricksAndBullets = function() {
     this.loopLen = this.bricks.length;
@@ -197,12 +182,6 @@ export const FillCanvas = function(){
         this.bricks[this.i].drawBrick(this.ctx);
       }
       this.drawBullets();
-    }
-  }
-  this.fireNewBullet = function(){
-    if(Math.random() < .02){
-      this.brick = this.bricks[this.i];
-      this.enemyBullets[this.i] = new Bullet(this.brick.x, this.brick.y, this.paddleX, this.brick.width, this.brick.height, this.canvas.height);
     }
   }
   this.drawBullets = function(){
@@ -258,20 +237,7 @@ export const FillCanvas = function(){
   }
   
     /*--- COLLISION --- */
-  
-  
-  this.removeBrick = function(coord){
-    this.loopLen = this.bricks.length
-    for(this.i = 0; this.i<this.loopLen; this.i++) {
-      if(this.bricks[this.i].dead) continue;
-      if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
-        this.score++;
-        this.sounds[1].play();
-        this.checkEnd();
-        return;
-      }
-    }
-  }
+
   this.bounce = function(str){
     if(str[0] === 'x'){
       this.xMov = -this.xMov;
@@ -299,7 +265,6 @@ export const FillCanvas = function(){
     this.moveCircleEdges(this.xPos, this.yPos);
     let edges = this.checkCircleEdgesForCollision()
     if(edges){
-      this.sounds[0].play();
       switch(edges.bounceSide){
         case 'top': {
           this.bounce('y');
@@ -343,15 +308,18 @@ export const FillCanvas = function(){
         }
         case 'sideWall': {
           this.bounce('x');
+          this.playSound(0);
           break;
         }
         case 'topWall': {
           this.bounce('y');
+          this.playSound(0);
           break;
         }
         case 'paddle': {
           this.paddleRebound(edges.coord[0]);
           this.bounce('p');
+          this.playSound(4);
           break;
         }
         case 'bottomWall': {
@@ -363,6 +331,7 @@ export const FillCanvas = function(){
             this.setBallPixelArray(this.xPos, this.yPos)
             this.xMov = 3;
             this.yMov = -(Math.abs(this.yMov) * .80);
+            this.playSound(3);
           }
           break;
         }
@@ -441,6 +410,33 @@ export const FillCanvas = function(){
     }
     return null;
   }
+  
+  /*---------------- ACTIONS ----------------- */
+
+  this.fireNewBullet = function(){
+    if(Math.random() < .02){
+      this.brick = this.bricks[this.i];
+      this.enemyBullets[this.i] = new Bullet(this.brick.x, this.brick.y, this.paddleX, this.brick.width, this.brick.height, this.canvas.height);
+      this.playSound(2);
+    }
+  }
+  this.removeBrick = function(coord){
+    this.loopLen = this.bricks.length
+    for(this.i = 0; this.i<this.loopLen; this.i++) {
+      if(this.bricks[this.i].dead) continue;
+      if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
+        this.score++;
+        this.playSound(1);
+        this.checkEnd();
+        return;
+      }
+    }
+  }
+  this.playSound = function(num){
+    this.sounds[num].pause();
+    this.sounds[num].currentTime = 0;
+    this.sounds[num].play();
+  }
   this.moveCircleEdges = function(x, y){
     this.loopLen = this.edges.top.length
     for(this.i=0; this.i<this.loopLen; this.i++){
@@ -462,7 +458,6 @@ export const FillCanvas = function(){
       this.edges.bottomLeft[this.i][0] += this.xMov;
       this.edges.bottomRight[this.i][0] += this.xMov;
     }
-    
   }
 
   /*---------------- BINDINGS ----------------- */
