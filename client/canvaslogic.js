@@ -11,7 +11,7 @@ export const FillCanvas = function(){
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
-  this.yMov = -4;
+  this.yMov = -5;
   this.i = 0;
   this.j = 0;
   this.loopLen = 0;
@@ -414,9 +414,9 @@ export const FillCanvas = function(){
   /*---------------- ACTIONS ----------------- */
 
   this.fireNewBullet = function(){
-    if(Math.random() < .02){
+    if(Math.random() < .002){
       this.brick = this.bricks[this.i];
-      this.enemyBullets[this.i] = new Bullet(this.brick.x, this.brick.y, this.paddleX, this.brick.width, this.brick.height, this.canvas.height);
+      this.enemyBullets[this.i] = new Bullet(this.brick.x, this.brick.y, this.paddleX, this.brick.width, this.brick.height, this.canvas.height, this.brick.personality);
       this.playSound(2);
     }
   }

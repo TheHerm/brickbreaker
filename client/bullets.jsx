@@ -1,4 +1,4 @@
-export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight, canvasHeight){
+export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight, canvasHeight, speed){
 
 /* -------------- VARIABLES ----------------*/
 
@@ -6,8 +6,8 @@ export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight,
   this.y = 0;
   this.yChange = 0;
   this.xChange = 0;
-  this.width = 30;
-  this.height = 70;
+  this.width = 10;
+  this.height = 30;
   this.drawing = null;
   this.bulletAngle = 0;
   this.target = 0;
@@ -32,7 +32,7 @@ export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight,
     this.bulletAngle = Math.atan2(opp, adj);
   }
   this.setXYChange = function(){
-    this.yChange = Math.random() + 1;
+    this.yChange = speed + 3;
     this.xChange = this.yChange * -this.bulletAngle;
   }
 
