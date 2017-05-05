@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FillCanvas } from './canvaslogic.js';
+import { BrickBreaker } from './canvaslogic.js';
 // import { connect } from 'react-redux';
 // import Store from '../redux/store.js';
 
@@ -9,24 +9,31 @@ class CanvasContainer extends React.Component{
     super(props);
     this.state = {
       start: 0,
-      game: null
+      game: null,
+      lives: 3,
+      score: 0
     }
     this.handleStartGame = this.handleStartGame.bind(this);
     this.handleEndGame = this.handleEndGame.bind(this);
+    this.updateGameStats = this.updateGameStats.bind(this);
   }
 
   componentDidMount(){
-    this.setState({ game: new FillCanvas()} );
+    this.setState({ game: new BrickBreaker(this.updateGameStats)} );
   }
 
   handleStartGame(){
-    this.setState({ start: 1 });
+    this.setState({ start: 1, score: this.state.game.score, lives: this.state.game.lives });
     this.state.game.startGame(this.props.height, this.props.width);
   }
 
   handleEndGame(){
     this.setState({ start: 0 });
     this.state.game.stopGame();
+  }
+
+  updateGameStats(){
+    this.setState({score: this.state.game.score, lives: this.state.game.lives})
   }
 
   render(){
@@ -44,7 +51,7 @@ class CanvasContainer extends React.Component{
           </div>
           <div className="stats">
             {
-              this.state.game && this.state.game.lives
+              this.state.game && this.state.lives
             }
           </div>
           <div className="stats">
@@ -52,7 +59,7 @@ class CanvasContainer extends React.Component{
           </div>
           <div className="stats">
             {
-              this.state.game && this.state.game.score
+              this.state.game && this.state.score
             }
           </div>
         </div>

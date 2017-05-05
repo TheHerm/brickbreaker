@@ -1,13 +1,16 @@
 import {Brick} from './bricks.jsx';
 import {Bullet} from './bullets.jsx';
 
-export const FillCanvas = function(){
+export const BrickBreaker = function(update){
 
 /*---------------- VARIABLES ----------------- */
 
   this.canvas = document.getElementById('myCanvas');
   this.ctx = this.canvas.getContext('2d');
-  this.background = new Image();
+  this.images = {
+    background: new Image(),
+    paddleSprites: [[1,0]]
+  }
   this.xPos = this.canvas.width / 2;
   this.yPos = this.canvas.height - 70;
   this.xMov = 4;
@@ -28,7 +31,6 @@ export const FillCanvas = function(){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-  this.paddleSprites = [[1,0]];
   this.sounds = new Array(5);
   this.edges = {
     left: new Array(1).fill([]),
@@ -40,6 +42,7 @@ export const FillCanvas = function(){
     bottomRight: new Array(1).fill([]),
     bottomLeft: new Array(1).fill([])
   };
+  this.tempBrickCount = 0;
 
 /*---------------- FUNCTIONS ----------------- */
 
@@ -47,17 +50,13 @@ export const FillCanvas = function(){
 
   this.startGame = function(){
     if(this.endGame == false){
-      // document.addEventListener("keydown", this.keyDownHandler, false);
-      // document.addEventListener("keyup", this.keyUpHandler, false);
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
       this.setBallPixelArray(this.xPos, this.yPos);
       this.createBricks();
       this.initializeSprites();
-      this.background.src = "spacebackground.jpg";
+      
       this.initializeSounds();
-      this.sounds[3].pause();
-      this.sounds[3].currentTime = 0;
-      this.sounds[3].play();
+      this.playSound(3);
       this.animate();
     }else {
       this.endGame = false;
@@ -143,9 +142,10 @@ export const FillCanvas = function(){
     requestAnimationFrame(this.animate);
   }
   this.initializeSprites = function(){
+    this.images.background.src = "spacebackground.jpg";
     for(this.i = 1; this.i<7; this.i++){
-      this.paddleSprites[this.i] = new Image();
-      this.paddleSprites[this.i].src = `Spaceship${this.i-1}.png`;
+      this.images.paddleSprites[this.i] = new Image();
+      this.images.paddleSprites[this.i].src = `Spaceship${this.i-1}.png`;
     }
   }
   this.initializeSounds = function(){
@@ -167,7 +167,7 @@ export const FillCanvas = function(){
   
   this.draw = function() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.drawImage(this.background, -1, -1, this.canvas.width, this.canvas.height);
+    this.ctx.drawImage(this.images.background, -1, -1, this.canvas.width + 1, this.canvas.height + 1);
     this.xPos += this.xMov;
     this.yPos += this.yMov;
     this.drawBall();
@@ -176,13 +176,16 @@ export const FillCanvas = function(){
   }
   this.drawBricksAndBullets = function() {
     this.loopLen = this.bricks.length;
+    this.tempBrickCount = 0;
     for(this.i = 0; this.i<this.loopLen; this.i++) {
       if(!this.bricks[this.i].dead){
+        this.tempBrickCount++;
         this.bricks[this.i].stepForward(this.xPos, this.yPos, this.paddleX);
         this.bricks[this.i].drawBrick(this.ctx);
       }
       this.drawBullets();
     }
+    this.updateScore();
   }
   this.drawBullets = function(){
     if(!this.enemyBullets[this.i] && !this.bricks[this.i].dead) {
@@ -227,13 +230,13 @@ export const FillCanvas = function(){
     // }
   }
   this.drawPaddle = function() {
-    if(this.paddleSprites[0][1] > 5) {
-      this.paddleSprites[0][0] = Math.round((Math.random() * 10000) % 5) + 1;
-      this.paddleSprites[0][1] = 0;
+    if(this.images.paddleSprites[0][1] > 5) {
+      this.images.paddleSprites[0][0] = Math.round((Math.random() * 10000) % 5) + 1;
+      this.images.paddleSprites[0][1] = 0;
     }else {
-      this.paddleSprites[0][1]++;
+      this.images.paddleSprites[0][1]++;
     }
-    this.ctx.drawImage(this.paddleSprites[this.paddleSprites[0][0]], this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
+    this.ctx.drawImage(this.images.paddleSprites[this.images.paddleSprites[0][0]], this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
   
     /*--- COLLISION --- */
@@ -323,7 +326,7 @@ export const FillCanvas = function(){
           break;
         }
         case 'bottomWall': {
-          this.lives--;
+          this.updateLives();
           this.checkEnd();
           if(this.lives){
             this.xPos = this.canvas.width / 2;
@@ -425,7 +428,6 @@ export const FillCanvas = function(){
     for(this.i = 0; this.i<this.loopLen; this.i++) {
       if(this.bricks[this.i].dead) continue;
       if(this.bricks[this.i].checkCollision(coord[0], coord[1])){
-        this.score++;
         this.playSound(1);
         this.checkEnd();
         return;
@@ -459,6 +461,16 @@ export const FillCanvas = function(){
       this.edges.bottomRight[this.i][0] += this.xMov;
     }
   }
+  this.updateScore = function(){
+    if(this.score !== this.brickCount - this.tempBrickCount){
+      this.score = this.brickCount - this.tempBrickCount;
+      update();
+    }
+  }
+  this.updateLives = function(){
+    this.lives--;
+    update();
+  }
 
   /*---------------- BINDINGS ----------------- */
   
@@ -475,8 +487,8 @@ export const FillCanvas = function(){
 
   /*-------------------- NOTES ------------------------------- */
 
-// var snd = new Audio("file.wav"); // buffers automatically when created
-// snd.play();
+  // document.addEventListener("keydown", this.keyDownHandler, false);
+  // document.addEventListener("keyup", this.keyUpHandler, false);
 
   // this.keyDownHandler = this.keyDownHandler.bind(this);
   // this.keyUpHandler = this.keyUpHandler.bind(this);

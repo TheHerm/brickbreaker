@@ -8,7 +8,7 @@ export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight,
   this.xChange = 0;
   this.width = 10;
   this.height = 30;
-  this.drawing = null;
+  this.drawing = new Image();
   this.bulletAngle = 0;
   this.target = 0;
   
@@ -18,7 +18,6 @@ export const Bullet = function(brickX, brickY, paddleX, brickWidth, brickHeight,
 
       /* --------- initialization ---------*/
   this.initialize = function(){
-    this.drawing = new Image();
     this.drawing.src = "laser.png";
     this.x = brickX + brickWidth/2;
     this.y = brickY + brickHeight;

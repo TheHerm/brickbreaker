@@ -30,8 +30,17 @@ export  const Brick = function(id){
   this.holdingPatternSpot = 0;
   this.holdingPatternLen = 0;
   this.circleRadius = (Math.random() * 10000000) % 60 + 15;
-  this.drawing = new Image() 
-  this.drawing.src = "evilship.png" 
+  this.explode = {
+    x: 0,
+    y: 0,
+    height: 0,
+    width: 0,
+    explode: false,
+    image: new Image()
+  };
+  this.spaceShip = new Image();
+  this.spaceShip.src = "evilship.png";
+  this.explode.image.src = "explosion.png";
 
 /* -------------- FUNCTIONS ----------------*/
 
@@ -165,17 +174,7 @@ export  const Brick = function(id){
         this.setY(this.holdingPattern[this.holdingPatternSpot][1], 0)
       }
   }
-  // this.controlBullet = function(paddleX){
-  //   if(this.bullet) {
-  //     this.bullet.stepForward();
-  //     return;
-  //   }
-  //   if(Math.random() < .2 ) {
-  //     this.bullet = new Bullets(this.x, this.y, paddleX, this.width, this.height, this.canvasHeight);
-  //   }
-  // }
   this.stepForward = function(ballX, ballY, paddleX){
-    // this.controlBullet(paddleX);
     this.ballDist = Math.sqrt(Math.pow(ballX-this.x, 2)+Math.pow(ballY-this.y, 2));
     if(this.ballDist > 275) {
       this.ballFarAway();
@@ -191,16 +190,31 @@ export  const Brick = function(id){
           /* --------- draw ---------*/
 
   this.drawBrick = function(ctx){
-    ctx.drawImage(this.drawing, this.x, this.y, this.width, this.height);
+    if(this.explode.explode) {
+      this.drawExplosion(ctx);
+    }else ctx.drawImage(this.spaceShip, this.x, this.y, this.width, this.height);
     // ctx.beginPath();
     // ctx.font = "16px Arial";
     // ctx.fillStyle = "white";
     // ctx.fillText(this.id, this.x+20, this.y+20);
     // ctx.closePath();
   }
+  this.drawExplosion = function(ctx){
+    ctx.drawImage(this.explode.image, this.explode.x, this.explode.y, this.explode.width, this.explode.height);
+    this.explode.width += 2;
+    this.explode.height += 2;
+    if(this.explode.width >= 2 * this.width) this.dead = true;
+  }
 
       /* --------- util functions ---------*/
   
+  this.activateExplosion = function(){
+    this.explode.x = this.x;
+    this.explode.y = this.y;
+    this.explode.height = this.height;
+    this.explode.width = this.width;
+    this.explode.explode = true;
+  }
   this.checkCollision = function(x, y){
     if(x>=this.x && x<=(this.x+this.width) && y>=this.y && y<=(this.y+this.height)){
       this.removeBrick();
@@ -212,7 +226,7 @@ export  const Brick = function(id){
       /* --------- state change ---------*/
 
   this.removeBrick = function(){
-    this.dead = true;
+    if(!this.explode.explode) this.activateExplosion();
   }
 
 /* -------------- BINDINGS -----------------*/
