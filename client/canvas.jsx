@@ -39,18 +39,18 @@ class CanvasContainer extends React.Component{
           {
             !!this.state.start && <div><button className="pause-btn" autoFocus onClick={this.handleEndGame}>Pause Game</button></div>
           }
-          <div>
+          <div className="stats">
             LIVES:
           </div>
-          <div>
+          <div className="stats">
             {
               this.state.game && this.state.game.lives
             }
           </div>
-          <div>
+          <div className="stats">
             SCORE:
           </div>
-          <div>
+          <div className="stats">
             {
               this.state.game && this.state.game.score
             }

@@ -192,11 +192,11 @@ export  const Brick = function(id){
 
   this.drawBrick = function(ctx){
     ctx.drawImage(this.drawing, this.x, this.y, this.width, this.height);
-    ctx.beginPath();
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText(this.id, this.x+20, this.y+20);
-    ctx.closePath();
+    // ctx.beginPath();
+    // ctx.font = "16px Arial";
+    // ctx.fillStyle = "white";
+    // ctx.fillText(this.id, this.x+20, this.y+20);
+    // ctx.closePath();
   }
 
       /* --------- util functions ---------*/

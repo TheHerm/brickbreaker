@@ -56,3 +56,8 @@ body{
 .spec:hover{
   box-shadow: 3px 3px 2px black;
 }
+
+.stats{
+  font-size: 1.5em;
+  margin: 5px;
+}
