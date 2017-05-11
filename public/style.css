@@ -20,16 +20,16 @@ body{
 
 #myCanvas{
   border: 1px solid black;
-  margin: 10px 0px;
+  /*margin: 10px 0px;*/
 }
 
 .start-btn{
-  width: 150px;
-  height: 75px;
+  width: 50%;
   background: #008a00;
   border: 1px solid black;
   border-radius: 2px;
-  margin-top: 35px;
+  padding: 5px;
+  margin-bottom: 20px;
 }
 
 .start-btn:hover{
@@ -37,12 +37,12 @@ body{
 }
 
 .pause-btn{
-  width: 150px;
-  height: 75px;
+  width: 50%;
   background: #fa6800;
   border: 1px solid black;
   border-radius: 2px;
-  margin-top: 35px;
+  padding: 5px;
+  margin-bottom: 20px;
 }
 
 .pause-btn:hover{
@@ -71,8 +71,12 @@ body{
   margin: 5px;
 }
 
-/*backup to personal site*/
-
+.brickbreaker-container{
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+}
 .brickbreaker-splash{
   width: 100%;
   display: flex;
@@ -108,4 +112,23 @@ body{
 }
 .hard{
   background-color: red;
+}
+
+.start-btn-img{
+  width: 60%;
+}
+
+.pause-btn-img{
+  width: 60%;
+}
+
+.stats-container{
+  padding: 30px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hidden{
+  display: none;
 }

@@ -13,7 +13,7 @@ export const BrickBreaker = function(update){
   }
   this.xPos = null;
   this.yPos = null;
-  this.xMov = 4;
+  this.xMov = (Math.random() * 10) - 5;
   this.yMov = -4;
   this.difficulty = 0;
   this.i = 0;
@@ -32,7 +32,7 @@ export const BrickBreaker = function(update){
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
-  this.sounds = new Array(5);
+  this.sounds = new Array(6);
   this.edges = {
     left: [[]],
     right: [[]],
@@ -82,8 +82,12 @@ export const BrickBreaker = function(update){
       this.animate();
     }
   }
-  this.stopGame = function(){
-    this.endGame = true;
+  this.pauseGame = function(){
+    if(!this.endGame){
+      this.endGame = true;
+    }else{
+      this.startGame();
+    }
   }
   this.checkEnd = function(){
     if(this.score == this.bricks.length) {
@@ -180,6 +184,8 @@ export const BrickBreaker = function(update){
     this.sounds[3].playbackRate = 1;
     this.sounds[4] = new Audio("paddle_bounce.mp3");
     this.sounds[4].playbackRate = 1;
+    this.sounds[5] = new Audio("countdown.mp3");
+    this.sounds[5].playbackRate = 1;
   }
 
     /*--- DRAW --- */
@@ -263,6 +269,7 @@ export const BrickBreaker = function(update){
     this.ctx.font = "100px Arial";
     this.ctx.fillStyle = "white";
     this.ctx.fillText(3, this.canvas.width/3, this.canvas.height/3);
+    this.playSound(5);
     this.ctx.closePath();
     setTimeout(()=>{
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -270,6 +277,7 @@ export const BrickBreaker = function(update){
       this.ctx.font = "100px Arial";
       this.ctx.fillStyle = "white";
       this.ctx.fillText(2, this.canvas.width/3, this.canvas.height/3);
+      this.playSound(5);
       this.ctx.closePath();
     }, 1000);
     setTimeout(()=>{
@@ -278,6 +286,7 @@ export const BrickBreaker = function(update){
       this.ctx.font = "100px Arial";
       this.ctx.fillStyle = "white";
       this.ctx.fillText(1, this.canvas.width/3, this.canvas.height/3);
+      this.playSound(5);
       this.ctx.closePath();
     }, 2000);
   }
@@ -369,14 +378,13 @@ export const BrickBreaker = function(update){
           break;
         }
         case 'bottomWall': {
-          console.log("bottom wall")
           this.updateLives();
           this.checkEnd();
           if(this.lives){
             this.xPos = this.canvas.width / 2;
             this.yPos = this.canvas.height-70;
             this.setBallPixelArray(this.xPos, this.yPos)
-            this.xMov = 3;
+            this.xMov = (Math.random() * 10) - 5;
             this.yMov = -(Math.abs(this.yMov) * .80);
             this.playSound(3);
           }
@@ -479,7 +487,8 @@ export const BrickBreaker = function(update){
     }
   }
   this.playSound = function(num){
-    this.sounds[num].pause();
+    // if(this.sounds[num].currentTime < this.sounds[num].duration/2) return;
+    // this.sounds[num].pause();
     this.sounds[num].currentTime = 0;
     this.sounds[num].play();
   }

@@ -21,7 +21,7 @@ export class MainContainer extends React.Component{
 
   render(){
     return (
-      <CanvasContainer height={$(document).height() - 20} width={Math.round($(document).width() * 4/5)}/>
+      <CanvasContainer height={$(document).height() - 20} width={Math.round($(document).width() * 7/8)}/>
     )
   }
 }

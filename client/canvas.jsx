@@ -12,8 +12,8 @@ class CanvasContainer extends React.Component{
       score: 0
     }
     this.handleStartGame = this.handleStartGame.bind(this);
-    this.handleEndGame = this.handleEndGame.bind(this);
     this.updateGameStats = this.updateGameStats.bind(this);
+    this.handlePauseGame = this.handlePauseGame.bind(this);
   }
 
   componentDidMount(){
@@ -45,17 +45,8 @@ class CanvasContainer extends React.Component{
     this.state.game.initializeGame();
   }
 
-  handleEndGame(){
-    this.setState({ start: false });
-    this.state.game.stopGame();
-  }
-
   handlePauseGame(){
-    if(this.state.pause){
-      // start game
-    }else {
-      // pause game
-    }
+    this.state.game.pauseGame();
     this.setState({ pause: !this.state.pause});
   }
 
@@ -65,7 +56,7 @@ class CanvasContainer extends React.Component{
 
   render(){
     return (
-      <div className="canvas-container">
+      <div className="brickbreaker-container">
         {
           !this.state.start ?
               <div className="brickbreaker-splash">
@@ -77,14 +68,10 @@ class CanvasContainer extends React.Component{
                 </div>
               </div>
             :
-              <div>
-                <div>
-                  {
-                    !this.state.start && <div><button className="start-btn" autoFocus onClick={this.handleStartGame}>Start Game</button></div>
-                  }
-                  {
-                    !!this.state.start && <div><button className="pause-btn" autoFocus onClick={this.handleEndGame}>Pause Game</button></div>
-                  }
+              <div className="canvas-container">
+                <div className="stats-container">
+                    <div className={!this.state.pause ? "start-btn hidden" : "start-btn"} autoFocus onClick={this.handlePauseGame}> <img className="start-btn-img"src="play.png" alt="play"/> </div>
+                    <div className={this.state.pause ? "pause-btn hidden" : "pause-btn"} autoFocus onClick={this.handlePauseGame}> <img className="pause-btn-img"src="pause.png" alt="pause"/> </div>
                   <div className="stats">
                     LIVES:
                   </div>
