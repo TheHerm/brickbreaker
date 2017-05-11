@@ -5,14 +5,14 @@ export const BrickBreaker = function(update){
 
 /*---------------- VARIABLES ----------------- */
 
-  this.canvas = document.getElementById('myCanvas');
-  this.ctx = this.canvas.getContext('2d');
+  this.canvas = null;
+  this.ctx = null;
   this.images = {
     background: new Image(),
     paddleSprites: [[1,0]]
   }
-  this.xPos = this.canvas.width / 2;
-  this.yPos = this.canvas.height - 70;
+  this.xPos = null;
+  this.yPos = null;
   this.xMov = 4;
   this.yMov = -5;
   this.i = 0;
@@ -22,7 +22,7 @@ export const BrickBreaker = function(update){
   this.ballRadius = 12;
   this.paddleHeight = 38;
   this.paddleWidth = 120;
-  this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+  this.paddleX = null
   this.rightPressed = false;
   this.leftPressed = false;
   this.brickCount = 20;
@@ -33,14 +33,14 @@ export const BrickBreaker = function(update){
   this.endGame = false;
   this.sounds = new Array(5);
   this.edges = {
-    left: new Array(1).fill([]),
-    right: new Array(1).fill([]),
-    bottom: new Array(1).fill([]),
-    top: new Array(1).fill([]),
-    topLeft: new Array(1).fill([]),
-    topRight: new Array(1).fill([]),
-    bottomRight: new Array(1).fill([]),
-    bottomLeft: new Array(1).fill([])
+    left: [[]],
+    right: [[]],
+    bottom: [[]],
+    top: [[]],
+    topLeft: [[]],
+    topRight: [[]],
+    bottomRight: [[]],
+    bottomLeft: [[]]
   };
   this.tempBrickCount = 0;
 
@@ -50,6 +50,11 @@ export const BrickBreaker = function(update){
 
   this.startGame = function(){
     if(this.endGame == false){
+      this.canvas = document.getElementById('myCanvas');
+      this.ctx = this.canvas.getContext('2d');
+      this.xPos = this.canvas.width / 2;
+      this.yPos = this.canvas.height - 70;
+      this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
       document.addEventListener("mousemove", this.mouseMoveHandler, false);
       this.setBallPixelArray(this.xPos, this.yPos);
       this.createBricks();

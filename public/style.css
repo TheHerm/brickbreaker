@@ -1,12 +1,21 @@
 body{
   background-color: #647687;
-  margin: 0;
+  margin: 0px;
+  height: 97vh;
+  padding: 1%;
+}
+
+#Main{
+  height: 100%;
+  width: 100%;
+  margin: 0px
 }
 
 .canvas-container{
   text-align: center;
   display: flex;
   justify-content: space-around;
+  height: 100%;
 }
 
 #myCanvas{
@@ -60,4 +69,43 @@ body{
 .stats{
   font-size: 1.5em;
   margin: 5px;
+}
+
+/*backup to personal site*/
+
+.brickbreaker-splash{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.brickbreaker-splash-btn{
+  width: 15%;
+  border: 1px solid white;
+  border-radius: 1px;
+  padding: 20px;
+  display: inline-block;
+  margin: 5px;
+
+}
+
+.brickbreaker-splash-btn-container{
+  position: absolute;
+  top: 500px;
+  width: 70%;
+}
+
+.splash-img{
+  width: 100%;
+  height: 100%;
+}
+
+.easy{
+  background-color: green;
+}
+.medium{
+  background-color: orange;
+}
+.hard{
+  background-color: red;
 }
