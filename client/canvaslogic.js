@@ -14,7 +14,8 @@ export const BrickBreaker = function(update){
   this.xPos = null;
   this.yPos = null;
   this.xMov = 4;
-  this.yMov = -5;
+  this.yMov = -4;
+  this.difficulty = 0;
   this.i = 0;
   this.j = 0;
   this.loopLen = 0;
@@ -25,9 +26,9 @@ export const BrickBreaker = function(update){
   this.paddleX = null
   this.rightPressed = false;
   this.leftPressed = false;
-  this.brickCount = 20;
-  this.bricks = new Array(this.brickCount).fill({dead: true});
-  this.enemyBullets = new Array(this.brickCount).fill(null);
+  this.brickCount = 10;
+  this.bricks = null;
+  this.enemyBullets = null;
   this.score = 0;
   this.lives = 3;
   this.endGame = false;
@@ -47,20 +48,33 @@ export const BrickBreaker = function(update){
 /*---------------- FUNCTIONS ----------------- */
 
     /*--- START STOP SETUP STATS --- */
-
+  this.setDifficulty = function(num){
+    this.difficulty = num;
+    this.yMov -= this.difficulty;
+    this.brickCount *= this.difficulty;
+    this.bricks = new Array(this.brickCount).fill({dead: true});
+    this.enemyBullets = new Array(this.brickCount).fill(null);
+  }
+  this.initializeGame = function(){
+    this.canvas = document.getElementById('myCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.xPos = this.canvas.width / 2;
+    this.yPos = this.canvas.height - 70;
+    this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
+    this.initializeSounds();
+    document.addEventListener("mousemove", this.mouseMoveHandler, false);
+    this.setBallPixelArray(this.xPos, this.yPos);
+    this.createBricks();
+    this.initializeSprites();
+    this.drawCountdown();
+    setTimeout(()=>{
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.drawImage(this.images.background, -1, -1, this.canvas.width + 1, this.canvas.height + 1);
+      this.startGame();
+    }, 3000);
+  }
   this.startGame = function(){
     if(this.endGame == false){
-      this.canvas = document.getElementById('myCanvas');
-      this.ctx = this.canvas.getContext('2d');
-      this.xPos = this.canvas.width / 2;
-      this.yPos = this.canvas.height - 70;
-      this.paddleX = (this.canvas.width - this.paddleWidth) / 2;
-      document.addEventListener("mousemove", this.mouseMoveHandler, false);
-      this.setBallPixelArray(this.xPos, this.yPos);
-      this.createBricks();
-      this.initializeSprites();
-      
-      this.initializeSounds();
       this.playSound(3);
       this.animate();
     }else {
@@ -243,6 +257,30 @@ export const BrickBreaker = function(update){
     }
     this.ctx.drawImage(this.images.paddleSprites[this.images.paddleSprites[0][0]], this.paddleX, this.canvas.height - this.paddleHeight, this.paddleWidth,this.paddleHeight);
   }
+  this.drawCountdown = function(){
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.beginPath();
+    this.ctx.font = "100px Arial";
+    this.ctx.fillStyle = "white";
+    this.ctx.fillText(3, this.canvas.width/3, this.canvas.height/3);
+    this.ctx.closePath();
+    setTimeout(()=>{
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.beginPath();
+      this.ctx.font = "100px Arial";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText(2, this.canvas.width/3, this.canvas.height/3);
+      this.ctx.closePath();
+    }, 1000);
+    setTimeout(()=>{
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.beginPath();
+      this.ctx.font = "100px Arial";
+      this.ctx.fillStyle = "white";
+      this.ctx.fillText(1, this.canvas.width/3, this.canvas.height/3);
+      this.ctx.closePath();
+    }, 2000);
+  }
   
     /*--- COLLISION --- */
 
@@ -331,6 +369,7 @@ export const BrickBreaker = function(update){
           break;
         }
         case 'bottomWall': {
+          console.log("bottom wall")
           this.updateLives();
           this.checkEnd();
           if(this.lives){

@@ -17,20 +17,32 @@ class CanvasContainer extends React.Component{
   }
 
   componentDidMount(){
-    this.setState({ game: new BrickBreaker(this.updateGameStats)} );
+    setTimeout(()=>{
+      this.setState({ game: new BrickBreaker(this.updateGameStats)} );
+    }, 1500);
   }
 
-  handleStartGame(){
+  componentDidUpdate(prevProps, prevState){
+    if(this.state.start === true && prevState.start === false){
+      this.countdown();
+    }
+  }
+
+  handleStartGame(num){
     if(this.state.start){
       return;
     }else {
+      this.state.game.setDifficulty(num);
       this.setState({ 
         start: true, 
         score: this.state.game.score, 
         lives: this.state.game.lives,
       });
     }
-    this.state.game.startGame(this.props.height, this.props.width);
+  }
+
+  countdown(){
+    this.state.game.initializeGame();
   }
 
   handleEndGame(){
